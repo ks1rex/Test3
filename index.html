@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Тест-тренажёр (темы в отдельных файлах)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+  :root {
+    --gap: 10px;
+    --bg-color: #1e1e1e;
+    --panel-color: #262626;
+    --text-color: #eaeaea;
+    --muted: #bdbdbd;
+    --button-bg: #323232;
+    --button-hover: #3c3c3c;
+    --button-text: #ffffff;
+    --accent: #6ba4ff;
+    --border-color: #444;
+  }
+  .light {
+    --bg-color: #ffffff;
+    --panel-color: #f4f4f4;
+    --text-color: #1e1e1e;
+    --muted: #555;
+    --button-bg: #e0e0e0;
+    --button-hover: #d5d5d5;
+    --button-text: #000;
+    --accent: #0066cc;
+    --border-color: #ccc;
+  }
+  body{
+    font-family: system-ui, sans-serif;
+    margin:20px;
+    background:var(--bg-color);
+    color:var(--text-color);
+  }
+  h2{margin:0 0 10px}
+  .row{display:flex;gap:var(--gap);flex-wrap:wrap;align-items:center}
+  .panel{border:1px solid var(--border-color);border-radius:12px;padding:12px;background:var(--panel-color)}
+  #question{white-space:pre-line;font-weight:600;margin:10px 0}
+  #answerInput{width:100%;min-height:110px;padding:10px;font-size:16px;background:var(--panel-color);color:var(--text-color);border:1px solid var(--border-color);border-radius:8px}
+  button{padding:8px 12px;border:none;border-radius:10px;cursor:pointer;background:var(--button-bg);color:var(--button-text)}
+  button:hover:not(:disabled){background:var(--button-hover)}
+  button:disabled{opacity:.45;cursor:not-allowed}
+  .pill{padding:4px 8px;border-radius:999px;background:var(--panel-color);color:var(--muted);border:1px solid var(--border-color)}
+  .spacer{height:8px}
+  #correctBox{white-space:pre-line;padding:10px;background:var(--panel-color);border:1px solid var(--border-color);border-radius:8px;color:var(--accent);display:none}
+  select{background:var(--panel-color);color:var(--text-color);border:1px solid var(--border-color);border-radius:8px;padding:6px}
+  #themeToggle{margin-left:auto}
+</style>
+</head>
+<body>
+
+<div class="row">
+  <h2>Тест-тренажёр</h2>
+  <button id="themeToggle">🌙/☀️</button>
+</div>
+
+<div class="panel row">
+  <label>Тема:
+    <select id="topicSelect"></select>
+  </label>
+</div>
+
+<div class="spacer"></div>
+
+<div class="panel row">
+  <label>С: <input id="rangeStart" type="number" min="1" value="1"></label>
+  <label>По: <input id="rangeEnd" type="number" min="1" value="1"></label>
+  <label><input id="shuffle" type="checkbox"> Перемешать</label>
+  <button id="startBtn">Начать</button>
+  <button id="wrongOnlyBtn" disabled>Ошибочные → новый прогон</button>
+  <span class="pill">Шаг: <span id="stepInfo">—/—</span></span>
+  <span class="pill">Ошибок: <span id="wrongCount">0</span></span>
+</div>
+
+<div class="spacer"></div>
+
+<div class="panel">
+  <div id="question">Выберите тему</div>
+  <textarea id="answerInput" placeholder="Ваш ответ..."></textarea>
+
+  <div class="row">
+    <button id="checkBtn" disabled>Показать ответ</button>
+    <button id="markRightBtn" disabled>Верно</button>
+    <button id="markWrongBtn" disabled>Неверно</button>
+  </div>
+
+  <div class="spacer"></div>
+  <div id="correctBox"></div>
+
+  <div class="spacer"></div>
+  <div class="row">
+    <button id="prevBtn" disabled>Назад</button>
+    <button id="nextBtn" disabled>Вперёд</button>
+  </div>
+</div>
+
+<script>
+// ТЕМА (светлая/тёмная)
+const body=document.body;
+if(localStorage.getItem("theme")==="light") body.classList.add("light");
+document.getElementById("themeToggle").onclick=()=>{
+  body.classList.toggle("light");
+  localStorage.setItem("theme", body.classList.contains("light")?"light":"dark");
+};
+
+// ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ
+let QA=[];
+let order=[];
+let idx=0;
+let wrongSet=new Set();
+
+// Загружаем список тем
+async function loadTopicList(){
+  const resp = await fetch("topics_index.json");
+  const topics = await resp.json();
+
+  const sel=document.getElementById("topicSelect");
+  sel.innerHTML="";
+
+  topics.forEach(t=>{
+    const opt=document.createElement("option");
+    opt.value=t.file;
+    opt.textContent=t.title;
+    sel.appendChild(opt);
+  });
+
+  sel.onchange = ()=> loadTopic(sel.value);
+  loadTopic(sel.value);
+}
+
+// Загружаем выбранную тему (.json)
+async function loadTopic(filename){
+  wrongSet.clear();
+  idx=0;
+
+  const resp = await fetch("topics/"+filename);
+  const data = await resp.json();
+
+  QA = data.questions;
+
+  document.getElementById("rangeStart").value = 1;
+  document.getElementById("rangeEnd").value = QA.length;
+  document.getElementById("question").textContent = "Нажмите «Начать»";
+  document.getElementById("correctBox").style.display="none";
+  updateButtons();
+}
+
+// Построение порядка
+function buildOrder(start, end){
+  order = [];
+  for(let i=start;i<end;i++) order.push(i);
+  if(document.getElementById("shuffle").checked)
+    order.sort(()=>Math.random()-0.5);
+  idx=0;
+}
+
+// Вывод шага
+function showStep(){
+  document.getElementById("stepInfo").textContent =
+    (order.length ? idx+1 : 0)+"/"+order.length;
+  document.getElementById("wrongCount").textContent = wrongSet.size;
+}
+
+// Вывод вопроса
+function showQA(){
+  if(!order.length){
+    document.getElementById("question").textContent="Нажмите «Начать»";
+    updateButtons();
+    return;
+  }
+
+  const q=QA[order[idx]].q;
+  document.getElementById("question").textContent=q;
+
+  document.getElementById("answerInput").value="";
+  const box=document.getElementById("correctBox");
+  box.style.display="none";
+  box.textContent="";
+
+  updateButtons();
+  showStep();
+}
+
+// Показ ответа
+function showAnswer(){
+  const a=QA[order[idx]].a;
+  const box=document.getElementById("correctBox");
+  box.textContent="Эталон:\n"+a;
+  box.style.display="block";
+
+  document.getElementById("markRightBtn").disabled=false;
+  document.getElementById("markWrongBtn").disabled=false;
+}
+
+// Обновление состояния кнопок
+function updateButtons(){
+  const state = order.length>0;
+  document.getElementById("checkBtn").disabled = !state;
+  document.getElementById("showAnswerBtn")?.disabled = !state;
+
+  document.getElementById("prevBtn").disabled = !(state && idx>0);
+  document.getElementById("nextBtn").disabled = !(state && idx<order.length-1);
+
+  document.getElementById("markRightBtn").disabled = true;
+  document.getElementById("markWrongBtn").disabled = true;
+
+  document.getElementById("wrongOnlyBtn").disabled = wrongSet.size===0;
+}
+
+// КНОПКИ
+document.getElementById("startBtn").onclick = ()=>{
+  const start = Math.max(1, parseInt(rangeStart.value||1)) - 1;
+  const end = Math.min(QA.length, parseInt(rangeEnd.value||QA.length));
+  if(start>=end) return alert("Неверный диапазон.");
+
+  buildOrder(start,end);
+  showQA();
+};
+
+document.getElementById("wrongOnlyBtn").onclick = ()=>{
+  if(!wrongSet.size) return;
+  order = Array.from(wrongSet);
+  if(shuffle.checked) order.sort(()=>Math.random()-0.5);
+  idx=0;
+  showQA();
+};
+
+document.getElementById("checkBtn").onclick = showAnswer;
+document.getElementById("markRightBtn").onclick = ()=>{
+  wrongSet.delete(order[idx]);
+  if(idx<order.length-1){idx++;showQA();} else showStep();
+};
+document.getElementById("markWrongBtn").onclick = ()=>{
+  wrongSet.add(order[idx]);
+  if(idx<order.length-1){idx++;showQA();} else showStep();
+};
+document.getElementById("nextBtn").onclick = ()=>{if(idx<order.length-1){idx++;showQA();}};
+document.getElementById("prevBtn").onclick = ()=>{if(idx>0){idx--;showQA();}};
+
+// СТАРТ
+loadTopicList();
+</script>
+
+</body>
+</html>
