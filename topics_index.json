@@ -6,5 +6,18 @@
   {
     "title": "БХ 2 этап",
     "file": "biochem2.json"
+    
+  },
+  { 
+    "title": "Микра частная", 
+    "file": "mikra_chastnaya.json" 
+  
+  },
+  { 
+    "title": "Микра общая", 
+    "file": "mikra_obshaya(1).json" 
+  
   }
+]
+
 ]
