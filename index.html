@@ -98,149 +98,216 @@
 </div>
 
 <script>
-// ТЕМА (светлая/тёмная)
-const body=document.body;
-if(localStorage.getItem("theme")==="light") body.classList.add("light");
-document.getElementById("themeToggle").onclick=()=>{
+/* ========== THEME (dark/light) ========== */
+const body = document.body;
+const themeToggle = document.getElementById("themeToggle");
+if (localStorage.getItem("theme") === "light") body.classList.add("light");
+themeToggle.onclick = () => {
   body.classList.toggle("light");
-  localStorage.setItem("theme", body.classList.contains("light")?"light":"dark");
+  localStorage.setItem("theme", body.classList.contains("light") ? "light" : "dark");
 };
 
-// ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ
-let QA=[];
-let order=[];
-let idx=0;
-let wrongSet=new Set();
+/* ========== DOM REFS ========== */
+const topicSelect = document.getElementById("topicSelect");
+const rangeStartElem = document.getElementById("rangeStart");
+const rangeEndElem = document.getElementById("rangeEnd");
+const shuffleElem = document.getElementById("shuffle");
 
-// Загружаем список тем
+const startBtn = document.getElementById("startBtn");
+const wrongOnlyBtn = document.getElementById("wrongOnlyBtn");
+const checkBtn = document.getElementById("checkBtn");
+const markRightBtn = document.getElementById("markRightBtn");
+const markWrongBtn = document.getElementById("markWrongBtn");
+const prevBtn = document.getElementById("prevBtn");
+const nextBtn = document.getElementById("nextBtn");
+
+const questionBox = document.getElementById("question");
+const answerInput = document.getElementById("answerInput");
+const correctBox = document.getElementById("correctBox");
+const stepInfo = document.getElementById("stepInfo");
+const wrongCount = document.getElementById("wrongCount");
+
+/* ========== STATE ========== */
+let QA = [];
+let order = [];
+let idx = 0;
+let wrongSet = new Set();
+
+/* ========== LOAD TOPIC LIST ========== */
 async function loadTopicList(){
-  const resp = await fetch("topics_index.json");
-  const topics = await resp.json();
+  try {
+    const resp = await fetch("topics_index.json");
+    if (!resp.ok) throw new Error("Нет topics_index.json");
+    const topics = await resp.json();
 
-  const sel=document.getElementById("topicSelect");
-  sel.innerHTML="";
+    topicSelect.innerHTML = "";
+    topics.forEach((t, i) => {
+      const opt = document.createElement("option");
+      opt.value = t.file;
+      opt.textContent = t.title || t.file;
+      topicSelect.appendChild(opt);
+    });
 
-  topics.forEach(t=>{
-    const opt=document.createElement("option");
-    opt.value=t.file;
-    opt.textContent=t.title;
-    sel.appendChild(opt);
-  });
+    // when user changes selection
+    topicSelect.onchange = () => loadTopic(topicSelect.value);
 
-  sel.onchange = ()=> loadTopic(sel.value);
-  loadTopic(sel.value);
+    // initialize with first option (if exists)
+    if(topicSelect.options.length > 0){
+      topicSelect.selectedIndex = 0;
+      loadTopic(topicSelect.value);
+    } else {
+      // no topics found
+      questionBox.textContent = "Темы не найдены. Добавьте topics_index.json и файлы в папку topics/";
+      updateButtons();
+    }
+  } catch (err) {
+    console.error(err);
+    questionBox.textContent = "Не удалось загрузить список тем: " + err.message;
+    topicSelect.innerHTML = "";
+    updateButtons();
+  }
 }
 
-// Загружаем выбранную тему (.json)
+/* ========== LOAD TOPIC (JSON) ========== */
 async function loadTopic(filename){
   wrongSet.clear();
-  idx=0;
-
-  const resp = await fetch("topics/"+filename);
-  const data = await resp.json();
-
-  QA = data.questions;
-
-  document.getElementById("rangeStart").value = 1;
-  document.getElementById("rangeEnd").value = QA.length;
-  document.getElementById("question").textContent = "Нажмите «Начать»";
-  document.getElementById("correctBox").style.display="none";
-  updateButtons();
-}
-
-// Построение порядка
-function buildOrder(start, end){
+  idx = 0;
   order = [];
-  for(let i=start;i<end;i++) order.push(i);
-  if(document.getElementById("shuffle").checked)
-    order.sort(()=>Math.random()-0.5);
-  idx=0;
-}
 
-// Вывод шага
-function showStep(){
-  document.getElementById("stepInfo").textContent =
-    (order.length ? idx+1 : 0)+"/"+order.length;
-  document.getElementById("wrongCount").textContent = wrongSet.size;
-}
-
-// Вывод вопроса
-function showQA(){
-  if(!order.length){
-    document.getElementById("question").textContent="Нажмите «Начать»";
+  if(!filename){
+    QA = [];
+    questionBox.textContent = "Выберите тему";
+    correctBox.style.display = "none";
     updateButtons();
     return;
   }
 
-  const q=QA[order[idx]].q;
-  document.getElementById("question").textContent=q;
+  try {
+    const resp = await fetch("topics/" + filename);
+    if (!resp.ok) throw new Error("Файл темы не найден: " + filename);
+    const data = await resp.json();
 
-  document.getElementById("answerInput").value="";
-  const box=document.getElementById("correctBox");
-  box.style.display="none";
-  box.textContent="";
+    QA = Array.isArray(data.questions) ? data.questions : (data || []).questions || [];
+
+    // safety: if QA is not array, try common shapes
+    if(!Array.isArray(QA)) QA = [];
+
+    rangeStartElem.value = 1;
+    rangeEndElem.value = QA.length || 1;
+    questionBox.textContent = "Нажмите «Начать»";
+    correctBox.style.display = "none";
+    correctBox.textContent = "";
+    updateButtons();
+  } catch (err) {
+    console.error(err);
+    QA = [];
+    questionBox.textContent = "Ошибка при загрузке темы: " + err.message;
+    correctBox.style.display = "none";
+    updateButtons();
+  }
+}
+
+/* ========== ORDER BUILD & NAV ========== */
+function buildOrder(start, end){
+  order = [];
+  // clamp
+  start = Math.max(0, Math.min(start, QA.length - 1));
+  end = Math.max(0, Math.min(end, QA.length));
+  for(let i = start; i < end; i++) order.push(i);
+  if(shuffleElem.checked) order.sort(() => Math.random() - 0.5);
+  idx = 0;
+}
+
+function showStep(){
+  stepInfo.textContent = (order.length ? (idx + 1) : 0) + "/" + (order.length || 0);
+  wrongCount.textContent = wrongSet.size;
+}
+
+/* ========== SHOW QA ========== */
+function showQA(){
+  if(!order.length){
+    questionBox.textContent = "Нажмите «Начать»";
+    answerInput.value = "";
+    correctBox.style.display = "none";
+    correctBox.textContent = "";
+    updateButtons();
+    showStep();
+    return;
+  }
+
+  const currentIndex = order[idx];
+  const qText = QA[currentIndex]?.q ?? ("Вопрос #" + (currentIndex + 1));
+  questionBox.textContent = qText;
+  answerInput.value = "";
+  correctBox.style.display = "none";
+  correctBox.textContent = "";
 
   updateButtons();
   showStep();
 }
 
-// Показ ответа
+/* ========== SHOW ANSWER ========== */
 function showAnswer(){
-  const a=QA[order[idx]].a;
-  const box=document.getElementById("correctBox");
-  box.textContent="Эталон:\n"+a;
-  box.style.display="block";
+  if(!order.length) return;
+  const aText = QA[order[idx]]?.a ?? "(эталон отсутствует)";
+  correctBox.textContent = "Эталон:\n" + aText;
+  correctBox.style.display = "block";
 
-  document.getElementById("markRightBtn").disabled=false;
-  document.getElementById("markWrongBtn").disabled=false;
+  markRightBtn.disabled = false;
+  markWrongBtn.disabled = false;
 }
 
-// Обновление состояния кнопок
+/* ========== UPDATE BUTTONS ========== */
 function updateButtons(){
-  const state = order.length>0;
-  document.getElementById("checkBtn").disabled = !state;
-  document.getElementById("showAnswerBtn")?.disabled = !state;
+  const hasOrder = order.length > 0;
+  checkBtn.disabled = !hasOrder;
+  markRightBtn.disabled = true;
+  markWrongBtn.disabled = true;
 
-  document.getElementById("prevBtn").disabled = !(state && idx>0);
-  document.getElementById("nextBtn").disabled = !(state && idx<order.length-1);
+  prevBtn.disabled = !(hasOrder && idx > 0);
+  nextBtn.disabled = !(hasOrder && idx < order.length - 1);
 
-  document.getElementById("markRightBtn").disabled = true;
-  document.getElementById("markWrongBtn").disabled = true;
+  wrongOnlyBtn.disabled = wrongSet.size === 0;
 
-  document.getElementById("wrongOnlyBtn").disabled = wrongSet.size===0;
+  // also disable start if no QA loaded
+  startBtn.disabled = QA.length === 0;
 }
 
-// КНОПКИ
-document.getElementById("startBtn").onclick = ()=>{
-  const start = Math.max(1, parseInt(rangeStart.value||1)) - 1;
-  const end = Math.min(QA.length, parseInt(rangeEnd.value||QA.length));
-  if(start>=end) return alert("Неверный диапазон.");
+/* ========== BUTTON HANDLERS ========== */
+startBtn.onclick = () => {
+  const start = Math.max(1, parseInt(rangeStartElem.value || 1)) - 1;
+  let end = Math.min(QA.length, parseInt(rangeEndElem.value || QA.length));
+  if (isNaN(start) || isNaN(end) || start < 0 || end <= start) {
+    return alert("Неверный диапазон. Убедитесь, что 'С' < 'По' и в пределах доступных вопросов.");
+  }
 
-  buildOrder(start,end);
+  buildOrder(start, end);
   showQA();
 };
 
-document.getElementById("wrongOnlyBtn").onclick = ()=>{
-  if(!wrongSet.size) return;
+wrongOnlyBtn.onclick = () => {
+  if (!wrongSet.size) return;
   order = Array.from(wrongSet);
-  if(shuffle.checked) order.sort(()=>Math.random()-0.5);
-  idx=0;
+  if (shuffleElem.checked) order.sort(() => Math.random() - 0.5);
+  idx = 0;
   showQA();
 };
 
-document.getElementById("checkBtn").onclick = showAnswer;
-document.getElementById("markRightBtn").onclick = ()=>{
-  wrongSet.delete(order[idx]);
-  if(idx<order.length-1){idx++;showQA();} else showStep();
-};
-document.getElementById("markWrongBtn").onclick = ()=>{
-  wrongSet.add(order[idx]);
-  if(idx<order.length-1){idx++;showQA();} else showStep();
-};
-document.getElementById("nextBtn").onclick = ()=>{if(idx<order.length-1){idx++;showQA();}};
-document.getElementById("prevBtn").onclick = ()=>{if(idx>0){idx--;showQA();}};
+checkBtn.onclick = showAnswer;
 
-// СТАРТ
+markRightBtn.onclick = () => {
+  wrongSet.delete(order[idx]);
+  if (idx < order.length - 1) { idx++; showQA(); } else { showStep(); updateButtons(); }
+};
+markWrongBtn.onclick = () => {
+  wrongSet.add(order[idx]);
+  if (idx < order.length - 1) { idx++; showQA(); } else { showStep(); updateButtons(); }
+};
+
+nextBtn.onclick = () => { if (idx < order.length - 1) { idx++; showQA(); } };
+prevBtn.onclick = () => { if (idx > 0) { idx--; showQA(); } };
+
+/* ========== INIT ========== */
 loadTopicList();
 </script>
 
