@@ -12,5 +12,10 @@
     "title": "Микра частная", 
     "file": "mikra1.json" 
   
+  },
+  { 
+    "title": "Микра общая", 
+    "file": "mikra.json" 
+  
   }
 ]
