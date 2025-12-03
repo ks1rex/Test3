@@ -309,46 +309,48 @@ prevBtn.onclick = () => { if (idx > 0) { idx--; showQA(); } };
 
 /* ========== INIT ========== */
 loadTopicList();
-  /* ========== KEYBOARD SHORTCUTS ========== */
+/* ========== KEYBOARD SHORTCUTS (fixed toggle) ========== */
 document.addEventListener("keydown", (e) => {
-
-  // Если в textarea — не ломаем перенос строки
+  // Enter внутри textarea: показать/скрыть ответ (Shift+Enter оставляет перенос)
   if (document.activeElement === answerInput) {
     if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault(); // блокируем обычный Enter
+      e.preventDefault();
       toggleAnswer();
     }
     return;
   }
 
-  // Enter → показать/скрыть ответ
+  // Общие горячие клавиши
   if (e.key === "Enter") {
     e.preventDefault();
     toggleAnswer();
-  }
-
-  // ← назад
-  if (e.key === "ArrowLeft") {
+  } else if (e.key === "ArrowLeft") {
     if (!prevBtn.disabled) prevBtn.click();
-  }
-
-  // → вперёд
-  if (e.key === "ArrowRight") {
+  } else if (e.key === "ArrowRight") {
     if (!nextBtn.disabled) nextBtn.click();
   }
 });
 
-/* ========== ANSWER TOGGLE ========== */
+/* ========== ANSWER TOGGLE (robust) ========== */
+function isAnswerVisible() {
+  // используем computed style — надёжно, даже если style.display == ""
+  return window.getComputedStyle(correctBox).display !== "none";
+}
+
 function toggleAnswer() {
-  if (correctBox.style.display === "block") {
-    // скрыть
+  if (isAnswerVisible()) {
+    // скрыть ответ
     correctBox.style.display = "none";
     correctBox.textContent = "";
+    // при скрытии блокируем кнопки пометки (чтобы не пометить без просмотра)
     markRightBtn.disabled = true;
     markWrongBtn.disabled = true;
   } else {
-    // показать
+    // показать ответ — используем существующую функцию showAnswer(),
+    // она выставит текст и активирует кнопки пометки
     showAnswer();
+    // убедимся, что бок корректно показан (на случай, если showAnswer не меняла display)
+    correctBox.style.display = "block";
   }
 }
 </script>
