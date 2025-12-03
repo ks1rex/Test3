@@ -46,7 +46,15 @@
   .pill{padding:4px 8px;border-radius:999px;background:var(--panel-color);color:var(--muted);border:1px solid var(--border-color)}
   .spacer{height:8px}
   #correctBox{white-space:pre-line;padding:10px;background:var(--panel-color);border:1px solid var(--border-color);border-radius:8px;color:var(--accent);display:none}
-  select{background:var(--panel-color);color:var(--text-color);border:1px solid var(--border-color);border-radius:8px;padding:6px}
+  /* Одинаковый стиль для select и input[type=number] */
+select,
+input[type=number] {
+  background: var(--panel-color);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 6px;
+}
   #themeToggle{margin-left:auto}
 </style>
 </head>
@@ -247,15 +255,43 @@ function showQA(){
 }
 
 /* ========== SHOW ANSWER ========== */
-function showAnswer(){
-  if(!order.length) return;
+/* ====== Надёжное отображение/скрытие ответа и переключение кнопки ====== */
+
+function showAnswer() {
+  if (!order.length) return;
   const aText = QA[order[idx]]?.a ?? "(эталон отсутствует)";
   correctBox.textContent = "Эталон:\n" + aText;
   correctBox.style.display = "block";
-
+  // включаем кнопки пометки после показа
   markRightBtn.disabled = false;
   markWrongBtn.disabled = false;
+  // обновляем текст кнопки, чтобы пользователь видел действие
+  checkBtn.textContent = "Скрыть ответ";
 }
+
+function hideAnswer() {
+  correctBox.style.display = "none";
+  correctBox.textContent = "";
+  // при скрытии — блокируем пометки
+  markRightBtn.disabled = true;
+  markWrongBtn.disabled = true;
+  checkBtn.textContent = "Показать ответ";
+}
+
+function isAnswerVisible() {
+  return window.getComputedStyle(correctBox).display !== "none";
+}
+
+function toggleAnswer() {
+  if (isAnswerVisible()) {
+    hideAnswer();
+  } else {
+    showAnswer();
+  }
+}
+
+// привязываем кнопку к toggle (заменить любую старую привязку showAnswer)
+checkBtn.onclick = toggleAnswer;
 
 /* ========== UPDATE BUTTONS ========== */
 function updateButtons(){
