@@ -329,7 +329,6 @@ wrongOnlyBtn.onclick = () => {
   showQA();
 };
 
-checkBtn.onclick = showAnswer;
 
 markRightBtn.onclick = () => {
   wrongSet.delete(order[idx]);
@@ -366,29 +365,6 @@ document.addEventListener("keydown", (e) => {
     if (!nextBtn.disabled) nextBtn.click();
   }
 });
-
-/* ========== ANSWER TOGGLE (robust) ========== */
-function isAnswerVisible() {
-  // используем computed style — надёжно, даже если style.display == ""
-  return window.getComputedStyle(correctBox).display !== "none";
-}
-
-function toggleAnswer() {
-  if (isAnswerVisible()) {
-    // скрыть ответ
-    correctBox.style.display = "none";
-    correctBox.textContent = "";
-    // при скрытии блокируем кнопки пометки (чтобы не пометить без просмотра)
-    markRightBtn.disabled = true;
-    markWrongBtn.disabled = true;
-  } else {
-    // показать ответ — используем существующую функцию showAnswer(),
-    // она выставит текст и активирует кнопки пометки
-    showAnswer();
-    // убедимся, что бок корректно показан (на случай, если showAnswer не меняла display)
-    correctBox.style.display = "block";
-  }
-}
 </script>
 
 </body>
