@@ -4,22 +4,22 @@
     "file": "physiology.json"
   },
   {
-    "title": "БХ 2 этап",
+    "title": "Биохимия 2 этап",
     "file": "biochem2.json"
     
   },
   { 
-    "title": "Микра частная", 
+    "title": "Микробиология частная", 
     "file": "mikra1.json" 
   
   },
   { 
-    "title": "Микра 1 этап", 
+    "title": "Микробиология 1 этап", 
     "file": "microbiology.json" 
   
   },
   { 
-    "title": "Микра общая", 
+    "title": "Микробиология общая", 
     "file": "mikra.json" 
   
   }
