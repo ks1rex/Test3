@@ -14,6 +14,11 @@
   
   },
   { 
+    "title": "Микра 1 этап", 
+    "file": "microbiology.json" 
+  
+  },
+  { 
     "title": "Микра общая", 
     "file": "mikra.json" 
   
