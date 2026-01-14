@@ -77,6 +77,7 @@ input[type=number] {
   <label>С: <input id="rangeStart" type="number" min="1" value="1"></label>
   <label>По: <input id="rangeEnd" type="number" min="1" value="1"></label>
   <label><input id="shuffle" type="checkbox"> Перемешать</label>
+  <label><input id="hideVariants" type="checkbox"> Скрыть количество вариантов</label>
   <button id="startBtn">Начать</button>
   <button id="wrongOnlyBtn" disabled>Ошибочные → новый прогон</button>
   <span class="pill">Шаг: <span id="stepInfo">—/—</span></span>
@@ -134,13 +135,16 @@ const answerInput = document.getElementById("answerInput");
 const correctBox = document.getElementById("correctBox");
 const stepInfo = document.getElementById("stepInfo");
 const wrongCount = document.getElementById("wrongCount");
-
+const hideVariantsElem = document.getElementById("hideVariants");
 /* ========== STATE ========== */
 let QA = [];
 let order = [];
 let idx = 0;
 let wrongSet = new Set();
 
+hideVariantsElem.onchange = () => {
+  showQA();
+};
 /* ========== LOAD TOPIC LIST ========== */
 async function loadTopicList(){
   try {
@@ -230,7 +234,14 @@ function showStep(){
   stepInfo.textContent = (order.length ? (idx + 1) : 0) + "/" + (order.length || 0);
   wrongCount.textContent = wrongSet.size;
 }
+  
+function normalizeQuestion(text) {
+  if (!hideVariantsElem.checked) return text;
 
+  // удаляем (число) ТОЛЬКО в конце строки
+  return text.replace(/\s*\(\d+\)\s*$/, "");
+}
+  
 /* ========== SHOW QA ========== */
 function showQA(){
   if(!order.length){
@@ -245,7 +256,7 @@ function showQA(){
 
   const currentIndex = order[idx];
   const qText = QA[currentIndex]?.q ?? ("Вопрос #" + (currentIndex + 1));
-  questionBox.textContent = qText;
+  questionBox.textContent = normalizeQuestion(qText);
   answerInput.value = "";
   correctBox.style.display = "none";
   correctBox.textContent = "";
