@@ -418,83 +418,60 @@ function showQA(){
 /* ====== Надёжное отображение/скрытие ответа и переключение кнопки ====== */
 
 function showAnswer() {
+  function showAnswer() {
   if (!order.length) return;
   const current = QA[order[idx]];
   if (!current) return;
-  const aText = QA[order[idx]]?.a ?? "(эталон отсутствует)";
-  if (current.type === "matching") {
 
-  let correct = true;
+  let out = "Эталон:\n\n";
 
-  document.querySelectorAll("select").forEach(select => {
-    const i = select.dataset.index;
-    if (parseInt(select.value) !== current.correct[i]) {
-      correct = false;
-    }
-  });
-
-  alert(correct ? "Верно" : "Неверно");
-  return;
-}
-
-
-if (current.type === "fill_each") {
-
-  let correct = true;
-
-  document.querySelectorAll("input[type='text']").forEach(input => {
-    const i = input.dataset.index;
-
-    if (input.value.trim().toLowerCase() !==
-        current.answers[i].toLowerCase()) {
-      correct = false;
-    }
-  });
-
-  alert(correct ? "Верно" : "Неверно");
-  return;
-}
-
-
-if (current.type === "sequence") {
-
-  let correct = true;
-
-  document.querySelectorAll("input[type='number']").forEach(input => {
-    const i = input.dataset.index;
-
-    if (parseInt(input.value) - 1 !==
-        current.correct_order[i]) {
-      correct = false;
-    }
-  });
-
-  alert(correct ? "Верно" : "Неверно");
-  return;
-}
-
-
-if (current.type === "assertion") {
-
-  const selected = document.querySelector("input[name='assertion']:checked");
-  if (!selected) {
-    alert("Выберите вариант");
-    return;
+  if (current.type === "single" || current.type === "multi") {
+    const arr = Array.isArray(current.correct) ? current.correct : [current.correct];
+    arr.forEach(i => {
+      out += "✔ " + current.options[i] + "\n";
+    });
   }
 
-  alert(parseInt(selected.value) === current.correct
-    ? "Верно"
-    : "Неверно");
+  else if (current.type === "matching") {
+    Object.keys(current.correct).forEach(k => {
+      const left = current.left[k];
+      const right = current.right[current.correct[k]];
+      out += left + " → " + right + "\n";
+    });
+  }
 
-  return;
-}
+  else if (current.type === "fill_each") {
+    current.items.forEach((q, i) => {
+      out += q + " " + current.answers[i] + "\n";
+    });
+  }
 
-  correctBox.textContent = "Эталон:\n" + aText;
+  else if (current.type === "sequence") {
+    current.correct_order.forEach((pos, i) => {
+      out += (i + 1) + ") " + current.items[pos] + "\n";
+    });
+  }
+
+  else if (current.type === "assertion") {
+    const variants = [
+      "Оба верны, есть связь",
+      "Оба верны, связи нет",
+      "Верно только первое",
+      "Верно только второе",
+      "Оба неверны"
+    ];
+    out += variants[current.correct];
+  }
+
+  else {
+    out += "(ответ не задан)";
+  }
+
+  correctBox.textContent = out;
   correctBox.style.display = "block";
-  // включаем кнопки пометки после показа
+
   markRightBtn.disabled = false;
   markWrongBtn.disabled = false;
-  // обновляем текст кнопки, чтобы пользователь видел действие
   checkBtn.textContent = "Скрыть ответ";
 }
 
