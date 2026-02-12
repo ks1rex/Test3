@@ -8,6 +8,10 @@
     "file": "biochem2.json"
     
   },
+  {
+  "file": "cardio.json",
+  "title": "Кардиотонические средства"
+  },
   { 
     "title": "Микробиология частная", 
     "file": "mikra1.json" 
