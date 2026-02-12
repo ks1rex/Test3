@@ -109,6 +109,7 @@ input[type=number] {
 </div>
 
 <script>
+"use strict";
 /* ========== THEME (dark/light) ========== */
 const body = document.body;
 const themeToggle = document.getElementById("themeToggle");
@@ -202,7 +203,11 @@ async function loadTopic(filename){
     if (!resp.ok) throw new Error("Файл темы не найден: " + filename);
     const data = await resp.json();
 
-    QA = Array.isArray(data.questions) ? data.questions : (data || []).questions || [];
+    QA = Array.isArray(data)
+      ? data
+      : Array.isArray(data.questions)
+        ? data.questions
+        : [];
 
     // safety: if QA is not array, try common shapes
     if(!Array.isArray(QA)) QA = [];
@@ -260,6 +265,11 @@ function showQA(){
   }
 
   const currentIndex = order[idx];
+  const current = QA[currentIndex];
+  if (!current) return;
+
+  answerContainer.innerHTML = "";
+  answerInput.style.display = "none";
   const qText = QA[currentIndex]?.q ?? ("Вопрос #" + (currentIndex + 1));
   switch (current.type) {
 
@@ -409,6 +419,8 @@ function showQA(){
 
 function showAnswer() {
   if (!order.length) return;
+  const current = QA[order[idx]];
+  if (!current) return;
   const aText = QA[order[idx]]?.a ?? "(эталон отсутствует)";
   if (current.type === "matching") {
 
