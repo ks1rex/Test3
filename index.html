@@ -89,6 +89,8 @@ input[type=number] {
 <div class="panel">
   <div id="question">Выберите тему</div>
   <textarea id="answerInput" placeholder="Ваш ответ..."></textarea>
+  <div id="answerContainer"></div>
+
 
   <div class="row">
     <button id="checkBtn" disabled>Показать ответ</button>
@@ -133,6 +135,7 @@ const nextBtn = document.getElementById("nextBtn");
 const questionBox = document.getElementById("question");
 const answerInput = document.getElementById("answerInput");
 const correctBox = document.getElementById("correctBox");
+const answerContainer = document.getElementById("answerContainer");
 const stepInfo = document.getElementById("stepInfo");
 const wrongCount = document.getElementById("wrongCount");
 const hideVariantsElem = document.getElementById("hideVariants");
@@ -247,6 +250,8 @@ function showQA(){
   if(!order.length){
     questionBox.textContent = "Нажмите «Начать»";
     answerInput.value = "";
+    answerContainer.innerHTML = "";
+    answerInput.style.display = "none";
     correctBox.style.display = "none";
     correctBox.textContent = "";
     updateButtons();
@@ -256,6 +261,140 @@ function showQA(){
 
   const currentIndex = order[idx];
   const qText = QA[currentIndex]?.q ?? ("Вопрос #" + (currentIndex + 1));
+  switch (current.type) {
+
+  case "single":
+  case "multi":
+
+    current.options.forEach((opt, i) => {
+
+      const inputType = current.type === "single" ? "radio" : "checkbox";
+
+      const label = document.createElement("label");
+      label.innerHTML = `
+        <input type="${inputType}" name="answer" value="${i}">
+        ${opt}
+      `;
+
+      answerContainer.appendChild(label);
+      answerContainer.appendChild(document.createElement("br"));
+    });
+
+    break;
+
+
+  case "matching":
+
+    const header = document.createElement("div");
+    header.innerHTML = `
+      <strong>${current.left_title || "Левая группа"}</strong>
+      &nbsp;&nbsp;&nbsp;&nbsp;
+      <strong>${current.right_title || "Правая группа"}</strong>
+    `;
+    answerContainer.appendChild(header);
+    answerContainer.appendChild(document.createElement("hr"));
+
+    current.left.forEach((item, i) => {
+
+      const select = document.createElement("select");
+      select.dataset.index = i;
+
+      const defaultOption = document.createElement("option");
+      defaultOption.value = "";
+      defaultOption.textContent = "-- выберите --";
+      select.appendChild(defaultOption);
+
+      current.right.forEach((option, j) => {
+        const opt = document.createElement("option");
+        opt.value = j;
+        opt.textContent = option;
+        select.appendChild(opt);
+      });
+
+      const row = document.createElement("div");
+      row.innerHTML = `<strong>${item}</strong> → `;
+      row.appendChild(select);
+
+      answerContainer.appendChild(row);
+    });
+
+    break;
+
+
+  case "fill_each":
+
+    current.items.forEach((item, i) => {
+
+      const input = document.createElement("input");
+      input.type = "text";
+      input.dataset.index = i;
+
+      const row = document.createElement("div");
+      row.textContent = item + " ";
+      row.appendChild(input);
+
+      answerContainer.appendChild(row);
+    });
+
+    break;
+
+
+  case "sequence":
+
+    current.items.forEach((item, i) => {
+
+      const input = document.createElement("input");
+      input.type = "number";
+      input.min = 1;
+      input.max = current.items.length;
+      input.dataset.index = i;
+
+      const row = document.createElement("div");
+      row.textContent = item + " — порядок: ";
+      row.appendChild(input);
+
+      answerContainer.appendChild(row);
+    });
+
+    break;
+
+
+  case "assertion":
+
+    const block = document.createElement("div");
+    block.innerHTML = `
+      <p>1) ${current.statement1}</p>
+      <p>2) ${current.statement2}</p>
+    `;
+    answerContainer.appendChild(block);
+
+    const variants = [
+      "Оба верны, есть связь",
+      "Оба верны, связи нет",
+      "Верно только первое",
+      "Верно только второе",
+      "Оба неверны"
+    ];
+
+    variants.forEach((text, i) => {
+
+      const label = document.createElement("label");
+      label.innerHTML = `
+        <input type="radio" name="assertion" value="${i}">
+        ${text}
+      `;
+
+      answerContainer.appendChild(label);
+      answerContainer.appendChild(document.createElement("br"));
+    });
+
+    break;
+
+
+  default:
+    answerInput.style.display = "block";
+}
+
   questionBox.textContent = normalizeQuestion(qText);
   answerInput.value = "";
   correctBox.style.display = "none";
@@ -271,6 +410,73 @@ function showQA(){
 function showAnswer() {
   if (!order.length) return;
   const aText = QA[order[idx]]?.a ?? "(эталон отсутствует)";
+  if (current.type === "matching") {
+
+  let correct = true;
+
+  document.querySelectorAll("select").forEach(select => {
+    const i = select.dataset.index;
+    if (parseInt(select.value) !== current.correct[i]) {
+      correct = false;
+    }
+  });
+
+  alert(correct ? "Верно" : "Неверно");
+  return;
+}
+
+
+if (current.type === "fill_each") {
+
+  let correct = true;
+
+  document.querySelectorAll("input[type='text']").forEach(input => {
+    const i = input.dataset.index;
+
+    if (input.value.trim().toLowerCase() !==
+        current.answers[i].toLowerCase()) {
+      correct = false;
+    }
+  });
+
+  alert(correct ? "Верно" : "Неверно");
+  return;
+}
+
+
+if (current.type === "sequence") {
+
+  let correct = true;
+
+  document.querySelectorAll("input[type='number']").forEach(input => {
+    const i = input.dataset.index;
+
+    if (parseInt(input.value) - 1 !==
+        current.correct_order[i]) {
+      correct = false;
+    }
+  });
+
+  alert(correct ? "Верно" : "Неверно");
+  return;
+}
+
+
+if (current.type === "assertion") {
+
+  const selected = document.querySelector("input[name='assertion']:checked");
+  if (!selected) {
+    alert("Выберите вариант");
+    return;
+  }
+
+  alert(parseInt(selected.value) === current.correct
+    ? "Верно"
+    : "Неверно");
+
+  return;
+}
+
   correctBox.textContent = "Эталон:\n" + aText;
   correctBox.style.display = "block";
   // включаем кнопки пометки после показа
