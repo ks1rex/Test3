@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8">
-<title>Тест-тренажёр (темы в отдельных файлах)</title>
+<title>Тест-тренажёр </title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
@@ -46,7 +46,7 @@
   .pill{padding:4px 8px;border-radius:999px;background:var(--panel-color);color:var(--muted);border:1px solid var(--border-color)}
   .spacer{height:8px}
   #correctBox{white-space:pre-line;padding:10px;background:var(--panel-color);border:1px solid var(--border-color);border-radius:8px;color:var(--accent);display:none}
-  /* Одинаковый стиль для select и input[type=number] */
+
 select,
 input[type=number] {
   background: var(--panel-color);
@@ -164,15 +164,15 @@ async function loadTopicList(){
       topicSelect.appendChild(opt);
     });
 
-    // when user changes selection
+
     topicSelect.onchange = () => loadTopic(topicSelect.value);
 
-    // initialize with first option (if exists)
+ 
     if(topicSelect.options.length > 0){
       topicSelect.selectedIndex = 0;
       loadTopic(topicSelect.value);
     } else {
-      // no topics found
+
       questionBox.textContent = "Темы не найдены. Добавьте topics_index.json и файлы в папку topics/";
       updateButtons();
     }
@@ -209,7 +209,7 @@ async function loadTopic(filename){
         ? data.questions
         : [];
 
-    // safety: if QA is not array, try common shapes
+
     if(!Array.isArray(QA)) QA = [];
 
     rangeStartElem.value = 1;
@@ -230,7 +230,7 @@ async function loadTopic(filename){
 /* ========== ORDER BUILD & NAV ========== */
 function buildOrder(start, end){
   order = [];
-  // clamp
+
   start = Math.max(0, Math.min(start, QA.length - 1));
   end = Math.max(0, Math.min(end, QA.length));
   for(let i = start; i < end; i++) order.push(i);
@@ -246,7 +246,7 @@ function showStep(){
 function normalizeQuestion(text) {
   if (!hideVariantsElem.checked) return text;
 
-  // удаляем (число) ТОЛЬКО в конце строки
+
   return text.replace(/\s*\(\d+\)\s*$/, "");
 }
   function shuffleArray(array) {
@@ -418,7 +418,7 @@ function showQA(){
 }
 
 /* ========== SHOW ANSWER ========== */
-/* ====== Надёжное отображение/скрытие ответа и переключение кнопки ====== */
+
 
 function showAnswer() {
   if (!order.length) return;
@@ -557,7 +557,7 @@ function showAnswer() {
 function hideAnswer() {
   correctBox.style.display = "none";
   correctBox.textContent = "";
-  // при скрытии — блокируем пометки
+
   markRightBtn.disabled = true;
   markWrongBtn.disabled = true;
   checkBtn.textContent = "Показать ответ";
@@ -575,7 +575,6 @@ function toggleAnswer() {
   }
 }
 
-// привязываем кнопку к toggle (заменить любую старую привязку showAnswer)
 checkBtn.onclick = toggleAnswer;
 
 /* ========== UPDATE BUTTONS ========== */
@@ -590,7 +589,7 @@ function updateButtons(){
 
   wrongOnlyBtn.disabled = wrongSet.size === 0;
 
-  // also disable start if no QA loaded
+
   startBtn.disabled = QA.length === 0;
 }
 
@@ -631,7 +630,6 @@ prevBtn.onclick = () => { if (idx > 0) { idx--; showQA(); } };
 loadTopicList();
 /* ========== KEYBOARD SHORTCUTS (fixed toggle) ========== */
 document.addEventListener("keydown", (e) => {
-  // Enter внутри textarea: показать/скрыть ответ (Shift+Enter оставляет перенос)
   if (document.activeElement === answerInput) {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
@@ -640,7 +638,6 @@ document.addEventListener("keydown", (e) => {
     return;
   }
 
-  // Общие горячие клавиши
   if (e.key === "Enter") {
     e.preventDefault();
     toggleAnswer();
