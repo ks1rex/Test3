@@ -249,7 +249,16 @@ function normalizeQuestion(text) {
   // удаляем (число) ТОЛЬКО в конце строки
   return text.replace(/\s*\(\d+\)\s*$/, "");
 }
-  
+  function shuffleArray(array) {
+  const arr = array.map((item, index) => ({ item, index }));
+
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+
+  return arr;
+}
 /* ========== SHOW QA ========== */
 function showQA(){
   if(!order.length){
@@ -276,14 +285,16 @@ function showQA(){
   case "single":
   case "multi":
 
-    current.options.forEach((opt, i) => {
+    const shuffledMulti = shuffleArray(current.options);
 
-      const inputType = current.type === "single" ? "radio" : "checkbox";
+    current._multiMap = shuffledMulti.map(el => el.index);
+
+    shuffledMulti.forEach((el, newIndex) => {
 
       const label = document.createElement("label");
       label.innerHTML = `
-        <input type="${inputType}" name="answer" value="${i}">
-        ${opt}
+        <input type="checkbox" name="answer" value="${newIndex}">
+        ${el.item}
       `;
 
       answerContainer.appendChild(label);
@@ -292,27 +303,16 @@ function showQA(){
 
     break;
 
-
   case "matching":
 
-    const header = document.createElement("div");
-    header.innerHTML = `
-      <strong>${current.left_title || "Левая группа"}</strong>
-      &nbsp;&nbsp;&nbsp;&nbsp;
-      <strong>${current.right_title || "Правая группа"}</strong>
-    `;
-    answerContainer.appendChild(header);
-    answerContainer.appendChild(document.createElement("hr"));
+    const shuffledLeft = shuffleArray(current.left);
 
-    current.left.forEach((item, i) => {
+    shuffledLeft.forEach((el) => {
+
+      const originalLeftIndex = el.index;
 
       const select = document.createElement("select");
-      select.dataset.index = i;
-
-      const defaultOption = document.createElement("option");
-      defaultOption.value = "";
-      defaultOption.textContent = "-- выберите --";
-      select.appendChild(defaultOption);
+      select.dataset.leftIndex = originalLeftIndex;
 
       current.right.forEach((option, j) => {
         const opt = document.createElement("option");
@@ -322,7 +322,7 @@ function showQA(){
       });
 
       const row = document.createElement("div");
-      row.innerHTML = `<strong>${item}</strong> → `;
+      row.innerHTML = `<strong>${el.item}</strong> → `;
       row.appendChild(select);
 
       answerContainer.appendChild(row);
@@ -330,17 +330,18 @@ function showQA(){
 
     break;
 
-
   case "fill_each":
 
-    current.items.forEach((item, i) => {
+    const shuffledFill = shuffleArray(current.items);
+
+    shuffledFill.forEach((el) => {
 
       const input = document.createElement("input");
       input.type = "text";
-      input.dataset.index = i;
+      input.dataset.originalIndex = el.index;
 
       const row = document.createElement("div");
-      row.textContent = item + " ";
+      row.textContent = el.item + " ";
       row.appendChild(input);
 
       answerContainer.appendChild(row);
@@ -351,16 +352,18 @@ function showQA(){
 
   case "sequence":
 
-    current.items.forEach((item, i) => {
+    const shuffledSeq = shuffleArray(current.items);
+
+    shuffledSeq.forEach((el) => {
 
       const input = document.createElement("input");
       input.type = "number";
       input.min = 1;
       input.max = current.items.length;
-      input.dataset.index = i;
+      input.dataset.originalIndex = el.index;
 
       const row = document.createElement("div");
-      row.textContent = item + " — порядок: ";
+      row.textContent = el.item + " — порядок: ";
       row.appendChild(input);
 
       answerContainer.appendChild(row);
@@ -422,7 +425,84 @@ function showAnswer() {
   const current = QA[order[idx]];
   if (!current) return;
 
+  // ===== ПРОВЕРКИ =====
+
+  if (current.type === "multi") {
+
+    const selected = [...document.querySelectorAll("input[name='answer']:checked")]
+      .map(el => current._multiMap[parseInt(el.value)])
+      .sort()
+      .join(",");
+
+    const correct = current.correct.slice().sort().join(",");
+
+    alert(selected === correct ? "Верно" : "Неверно");
+  }
+
+
+  if (current.type === "matching") {
+
+    let ok = true;
+
+    document.querySelectorAll("select").forEach(select => {
+      const leftIndex = parseInt(select.dataset.leftIndex);
+      const chosenRight = parseInt(select.value);
+
+      if (chosenRight !== current.correct[leftIndex]) {
+        ok = false;
+      }
+    });
+
+    alert(ok ? "Верно" : "Неверно");
+  }
+
+
+  if (current.type === "fill_each") {
+
+    let ok = true;
+
+    document.querySelectorAll("input[type='text']").forEach(input => {
+      const originalIndex = parseInt(input.dataset.originalIndex);
+
+      if (input.value.trim().toLowerCase() !==
+          current.answers[originalIndex].toLowerCase()) {
+        ok = false;
+      }
+    });
+
+    alert(ok ? "Верно" : "Неверно");
+  }
+
+
+  if (current.type === "sequence") {
+
+    let ok = true;
+
+    document.querySelectorAll("input[type='number']").forEach(input => {
+      const originalIndex = parseInt(input.dataset.originalIndex);
+
+      if (parseInt(input.value) - 1 !==
+          current.correct_order[originalIndex]) {
+        ok = false;
+      }
+    });
+
+    alert(ok ? "Верно" : "Неверно");
+  }
+
   let out = "Эталон:\n\n";
+
+  if (current.type === "multi") {
+
+    const selected = [...document.querySelectorAll("input[name='answer']:checked")]
+      .map(el => current._multiMap[parseInt(el.value)])
+      .sort()
+      .join(",");
+
+    const correct = current.correct.slice().sort().join(",");
+
+    alert(selected === correct ? "Верно" : "Неверно");
+  }
 
   if (current.type === "single" || current.type === "multi") {
     const arr = Array.isArray(current.correct) ? current.correct : [current.correct];
