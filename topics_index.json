@@ -16,9 +16,13 @@
   "file": "farma2.json",
   "title": "Фармакология 2"
   },
-    {
+  {
   "file": "farma3.json",
   "title": "Фармакология 3"
+  },
+  {
+  "file": "farma4.json",
+  "title": "Фармакология 4"
   },
   { 
     "title": "Микробиология частная", 
