@@ -234,7 +234,7 @@ function buildOrder(start, end){
   start = Math.max(0, Math.min(start, QA.length - 1));
   end = Math.max(0, Math.min(end, QA.length));
   for(let i = start; i < end; i++) order.push(i);
-  if(shuffleElem.checked) order.sort(() => Math.random() - 0.5);
+  if(shuffleElem.checked) fisherYates(order);
   idx = 0;
 }
 
@@ -257,6 +257,14 @@ function normalizeQuestion(text) {
     [arr[i], arr[j]] = [arr[j], arr[i]];
   }
 
+  return arr;
+}
+
+function fisherYates(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
   return arr;
 }
 /* ========== SHOW QA ========== */
@@ -609,7 +617,7 @@ startBtn.onclick = () => {
 wrongOnlyBtn.onclick = () => {
   if (!wrongSet.size) return;
   order = Array.from(wrongSet);
-  if (shuffleElem.checked) order.sort(() => Math.random() - 0.5);
+  if (shuffleElem.checked) fisherYates(order);
   idx = 0;
   showQA();
 };
