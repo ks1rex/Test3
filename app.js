@@ -369,53 +369,45 @@ function showAnswer() {
 
 
   if (current.type === "matching") {
-
     let ok = true;
-
-    document.querySelectorAll("select").forEach(select => {
+    // Scope to answerContainer to avoid capturing #topicSelect
+    answerContainer.querySelectorAll("select").forEach(select => {
       const leftIndex = parseInt(select.dataset.leftIndex);
       const chosenRight = parseInt(select.value);
-
-      if (chosenRight !== current.correct[leftIndex]) {
-        ok = false;
-      }
+      if (chosenRight !== current.correct[leftIndex]) ok = false;
     });
-
     showResult(ok);
   }
-
 
   if (current.type === "fill_each") {
-
     let ok = true;
-
-    document.querySelectorAll("input[type='text']").forEach(input => {
+    answerContainer.querySelectorAll("input[type='text']").forEach(input => {
       const originalIndex = parseInt(input.dataset.originalIndex);
-
       if (input.value.trim().toLowerCase() !==
-          current.answers[originalIndex].toLowerCase()) {
-        ok = false;
-      }
+          current.answers[originalIndex].toLowerCase()) ok = false;
     });
-
     showResult(ok);
   }
 
-
   if (current.type === "sequence") {
-
-    let ok = true;
-
-    document.querySelectorAll("input[type='number']").forEach(input => {
-      const originalIndex = parseInt(input.dataset.originalIndex);
-
-      if (parseInt(input.value) - 1 !==
-          current.correct_order[originalIndex]) {
-        ok = false;
-      }
+    // correct_order[stepIdx] = originalIndex of item at that step.
+    // Build inverse: correctStepOf[originalIndex] = stepIdx (0-based).
+    const correctStepOf = {};
+    current.correct_order.forEach((origIdx, stepIdx) => {
+      correctStepOf[origIdx] = stepIdx;
     });
-
+    let ok = true;
+    // Scope to answerContainer to avoid capturing #rangeStart / #rangeEnd
+    answerContainer.querySelectorAll("input[type='number']").forEach(input => {
+      const originalIndex = parseInt(input.dataset.originalIndex);
+      if (parseInt(input.value) - 1 !== correctStepOf[originalIndex]) ok = false;
+    });
     showResult(ok);
+  }
+
+  if (current.type === "assertion") {
+    const selected = document.querySelector("input[name='assertion']:checked");
+    showResult(selected !== null && parseInt(selected.value) === current.correct);
   }
 
   let out = "Эталон:\n\n";
