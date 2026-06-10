@@ -601,13 +601,22 @@ function updateAccessPill(expiresAt) {
 
 // Переводит типичные ошибки Supabase Auth в читаемый русский текст
 function translateAuthError(msg) {
+  if (!msg) return 'Неизвестная ошибка. Попробуйте снова.';
+  if (/fetch|network|failed to fetch/i.test(msg)) {
+    return 'Ошибка соединения. Проверьте интернет и попробуйте снова.';
+  }
   const map = {
     'Email not confirmed': 'Email не подтверждён — проверьте почту и перейдите по ссылке из письма.',
     'Invalid login credentials': 'Неверный email или пароль.',
-    'User already registered': 'Этот email уже зарегистрирован.',
+    'User already registered': 'Пользователь с таким email уже зарегистрирован.',
     'Password should be at least 6 characters': 'Пароль должен содержать минимум 6 символов.',
-    'Unable to validate email address: invalid format': 'Некорректный формат email.',
-    'Email rate limit exceeded': 'Слишком много попыток. Попробуйте позже.',
+    'Unable to validate email address: invalid format': 'Некорректный формат email-адреса.',
+    'Email rate limit exceeded': 'Слишком много попыток. Подождите и попробуйте снова.',
+    'over_email_send_rate_limit': 'Слишком много писем. Подождите несколько минут.',
+    'signup_disabled': 'Регистрация временно недоступна.',
+    'weak_password': 'Слишком слабый пароль. Используйте не менее 6 символов.',
+    'email_address_invalid': 'Некорректный email-адрес.',
+    'For security purposes, you can only request this after': 'Слишком много запросов. Подождите немного и попробуйте снова.',
   };
   return map[msg] ?? msg;
 }
@@ -698,7 +707,15 @@ signOutFromActivation.onclick = async () => {
 };
 
 async function initAccess() {
-  const { loggedIn, hasAccess, expiresAt } = await checkAccess();
+  let result;
+  try {
+    result = await checkAccess();
+  } catch (err) {
+    showScreen(authScreen);
+    showAuthError('Ошибка соединения. Проверьте интернет и обновите страницу.');
+    return;
+  }
+  const { loggedIn, hasAccess, expiresAt } = result;
   if (!loggedIn) {
     showScreen(authScreen);
   } else if (!hasAccess) {
