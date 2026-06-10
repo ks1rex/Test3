@@ -51,7 +51,7 @@
     <p id="activationHint" class="auth-hint">Введите код активации, чтобы получить доступ к тренажёру.</p>
     <div id="activationError" class="auth-msg auth-msg--error" style="display:none"></div>
     <label class="auth-label">Код активации
-      <input id="codeInput" class="auth-input" type="text" placeholder="XXXX-XXXX">
+      <input id="codeInput" class="auth-input" type="text" placeholder="XXXX-XXXX" maxlength="9" spellcheck="false" autocapitalize="none" autocorrect="off">
     </label>
     <button id="activateBtn" class="auth-btn">Активировать</button>
     <button id="signOutFromActivation" class="btn-link">Выйти из аккаунта</button>
@@ -95,7 +95,7 @@
 <div class="spacer"></div>
 
 <div class="panel">
-  <div id="question">Выберите тему</div>
+  <div id="question" aria-live="polite">Выберите тему</div>
   <div id="firstRunHint" class="first-run-hint" style="display:none">
     <span>1.&nbsp;Выберите тему</span>
     <span class="first-run-sep">→</span>

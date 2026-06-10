@@ -244,6 +244,7 @@ function showQA(){
 
       const select = document.createElement("select");
       select.dataset.leftIndex = originalLeftIndex;
+      select.setAttribute("aria-label", el.item);
 
       current.right.forEach((option, j) => {
         const opt = document.createElement("option");
@@ -273,6 +274,7 @@ function showQA(){
       const input = document.createElement("input");
       input.type = "text";
       input.dataset.originalIndex = el.index;
+      input.setAttribute("aria-label", el.item);
 
       const row = document.createElement("div");
       row.textContent = el.item + " ";
@@ -295,6 +297,7 @@ function showQA(){
       input.min = 1;
       input.max = current.items.length;
       input.dataset.originalIndex = el.index;
+      input.setAttribute("aria-label", el.item + " — порядковый номер");
 
       const row = document.createElement("div");
       row.textContent = el.item + " — порядок: ";
@@ -594,6 +597,12 @@ const backToSignIn = document.getElementById("backToSignIn");
 const passwordHint = document.getElementById("passwordHint");
 const passwordToggle = document.getElementById("passwordToggle");
 
+// Enter-to-submit on auth and activation forms
+[authEmail, authPassword].forEach(el => {
+  el.addEventListener("keydown", e => { if (e.key === "Enter") authSubmitBtn.click(); });
+});
+codeInput.addEventListener("keydown", e => { if (e.key === "Enter") activateBtn.click(); });
+
 let isSignInMode = true;
 
 function setAuthMode(isSignIn) {
@@ -606,6 +615,7 @@ function setAuthMode(isSignIn) {
   passwordHint.style.display = isSignIn ? "none" : "";
   // reset password visibility on tab switch
   authPassword.type = "password";
+  passwordToggle.setAttribute("aria-label", "Показать пароль");
   const pi = passwordToggle.querySelector("i");
   if (pi) { pi.dataset.lucide = "eye"; lucide.createIcons(); }
 }
@@ -676,6 +686,7 @@ backToSignIn.onclick = () => {
 passwordToggle.onclick = () => {
   const isHidden = authPassword.type === "password";
   authPassword.type = isHidden ? "text" : "password";
+  passwordToggle.setAttribute("aria-label", isHidden ? "Скрыть пароль" : "Показать пароль");
   const pi = passwordToggle.querySelector("i");
   if (pi) { pi.dataset.lucide = isHidden ? "eye-off" : "eye"; lucide.createIcons(); }
 };
@@ -827,6 +838,9 @@ document.addEventListener("keydown", (e) => {
     }
     return;
   }
+  // Don't intercept arrow/enter when fill_each/sequence inputs or matching selects have focus
+  const tag = document.activeElement.tagName;
+  if (tag === "INPUT" || tag === "SELECT") return;
 
   if (e.key === "Enter") {
     e.preventDefault();

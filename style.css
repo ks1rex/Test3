@@ -167,6 +167,7 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   font-size: 1.05em;
   line-height: 1.6;
   margin: 0 0 14px;
+  overflow-wrap: break-word;
 }
 
 /* ===== ANSWER TEXTAREA ===== */
@@ -194,6 +195,7 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   color: var(--accent);
   display: none;
   line-height: 1.6;
+  overflow-wrap: break-word;
 }
 
 /* ===== RESULT BOX ===== */
@@ -417,6 +419,19 @@ label .lucide { width: 16px; height: 16px; }
   color: var(--muted);
 }
 .first-run-sep { opacity: 0.45; flex-shrink: 0; }
+
+/* ===== ANSWER CONTAINER ROWS ===== */
+#answerContainer > div { overflow-wrap: break-word; }
+
+/* ===== REDUCED MOTION ===== */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .loading-dots::after { content: "..." !important; animation: none !important; }
+}
 
 /* ===== MOBILE (≤480px) ===== */
 @media (max-width: 480px) {
