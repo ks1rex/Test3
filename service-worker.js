@@ -1,10 +1,11 @@
 
-const CACHE_NAME = 'test-trainer-v2';
+const CACHE_NAME = 'test-trainer-v3';
 const ASSETS = [
   './',
   'index.html',
   'style.css',
   'app.js',
+  'auth.js',
   'manifest.json',
   'icon-192.png',
   'icon-512.png',
@@ -41,13 +42,15 @@ self.addEventListener('activate', (evt) => {
 });
 
 self.addEventListener('fetch', (evt) => {
+  // Не перехватываем cross-origin запросы (Supabase API, CDN и т.д.)
+  if (!evt.request.url.startsWith(self.location.origin)) return;
+
   evt.respondWith(
     caches.match(evt.request).then(cached => {
       if (cached) return cached;
       return fetch(evt.request).then(res => {
         return caches.open(CACHE_NAME).then(cache => { cache.put(evt.request, res.clone()); return res; });
       }).catch(() => {
-        // fallback to index.html for navigation requests
         if (evt.request.mode === 'navigate') return caches.match('index.html');
       });
     })
