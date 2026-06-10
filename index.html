@@ -8,9 +8,46 @@
 </head>
 <body>
 
+<!-- ===== AUTH SCREEN ===== -->
+<div id="authScreen" class="screen-center">
+  <div class="auth-card panel">
+    <h2 class="auth-title">Тест-тренажёр</h2>
+    <div class="auth-tabs row">
+      <button id="tabSignIn" class="tab-btn tab-active">Вход</button>
+      <button id="tabSignUp" class="tab-btn">Регистрация</button>
+    </div>
+    <div id="authError" class="auth-msg auth-msg--error" style="display:none"></div>
+    <label class="auth-label">Email
+      <input id="authEmail" class="auth-input" type="email" autocomplete="email" placeholder="you@example.com">
+    </label>
+    <label class="auth-label">Пароль
+      <input id="authPassword" class="auth-input" type="password" autocomplete="current-password" placeholder="••••••••">
+    </label>
+    <button id="authSubmitBtn" class="auth-btn">Войти</button>
+  </div>
+</div>
+
+<!-- ===== ACTIVATION SCREEN ===== -->
+<div id="activationScreen" class="screen-center" style="display:none">
+  <div class="auth-card panel">
+    <h2 class="auth-title">Активация доступа</h2>
+    <p class="auth-hint">Введите код активации, чтобы получить доступ к тренажёру.</p>
+    <div id="activationError" class="auth-msg auth-msg--error" style="display:none"></div>
+    <label class="auth-label">Код активации
+      <input id="codeInput" class="auth-input" type="text" placeholder="XXXX-XXXX">
+    </label>
+    <button id="activateBtn" class="auth-btn">Активировать</button>
+    <button id="signOutFromActivation" class="btn-link">Выйти из аккаунта</button>
+  </div>
+</div>
+
+<!-- ===== APP SCREEN ===== -->
+<div id="appScreen" style="display:none">
+
 <div class="row">
   <h2>Тест-тренажёр</h2>
   <button id="themeToggle">🌙/☀️</button>
+  <button id="signOutBtn">Выйти</button>
 </div>
 
 <div class="panel row">
@@ -39,7 +76,6 @@
   <textarea id="answerInput" placeholder="Ваш ответ..."></textarea>
   <div id="answerContainer"></div>
 
-
   <div class="row">
     <button id="checkBtn" disabled>Показать ответ</button>
     <button id="markRightBtn" disabled>Верно</button>
@@ -56,6 +92,8 @@
     <button id="nextBtn" disabled>Вперёд</button>
   </div>
 </div>
+
+</div><!-- /#appScreen -->
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="auth.js"></script>
