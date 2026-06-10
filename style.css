@@ -10,6 +10,8 @@
   --button-text: #e8edf2;
   --accent: #14a89a;
   --accent-hover: #0f8f82;
+  --accent-btn: #0b7a6e;
+  --accent-btn-hover: #09665c;
   --border-color: #34445c;
   --success: #2e8b57;
   --success-bg: rgba(46, 139, 87, 0.14);
@@ -34,6 +36,8 @@
   --button-text: #1a2332;
   --accent: #0e8a7d;
   --accent-hover: #0a7068;
+  --accent-btn: #0c6a60;
+  --accent-btn-hover: #0a5850;
   --border-color: #dde3ea;
   --success: #2e8b57;
   --success-bg: #e8f5e9;
@@ -85,15 +89,16 @@ button {
 }
 button:hover:not(:disabled) { background: var(--button-hover); }
 button:disabled { opacity: 0.45; cursor: not-allowed; }
+button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
 /* primary — filled accent */
 .btn-primary {
-  background: var(--accent);
+  background: var(--accent-btn);
   color: #fff;
-  border-color: var(--accent);
+  border-color: var(--accent-btn);
   font-weight: 600;
 }
-.btn-primary:hover:not(:disabled) { background: var(--accent-hover); border-color: var(--accent-hover); }
+.btn-primary:hover:not(:disabled) { background: var(--accent-btn-hover); border-color: var(--accent-btn-hover); }
 
 /* outline — transparent with accent border */
 .btn-outline {
@@ -279,8 +284,8 @@ select:focus, input[type=number]:focus { outline: none; border-color: var(--acce
 /* tabs */
 .auth-tabs { gap: 0; border-radius: var(--radius-input); overflow: hidden; border: 1px solid var(--border-color); }
 .tab-btn { flex: 1; border-radius: 0; border: none; background: var(--panel-color); color: var(--muted); font-size: 0.92em; padding: 9px 12px; }
-.tab-btn.tab-active { background: var(--accent); color: #fff; }
-.tab-btn.tab-active:hover:not(:disabled) { background: var(--accent-hover); }
+.tab-btn.tab-active { background: var(--accent-btn); color: #fff; }
+.tab-btn.tab-active:hover:not(:disabled) { background: var(--accent-btn-hover); }
 .tab-btn:not(.tab-active):hover:not(:disabled) { background: var(--button-hover); color: var(--text-color); }
 
 /* field labels */
@@ -316,9 +321,9 @@ select:focus, input[type=number]:focus { outline: none; border-color: var(--acce
   padding: 11px;
   font-size: 1em;
   font-weight: 600;
-  background: var(--accent);
+  background: var(--accent-btn);
   color: #fff;
-  border: 1px solid var(--accent);
+  border: 1px solid var(--accent-btn);
   border-radius: var(--radius-input);
   display: flex;
   align-items: center;
@@ -326,7 +331,7 @@ select:focus, input[type=number]:focus { outline: none; border-color: var(--acce
   gap: 6px;
   transition: background 0.15s, opacity 0.15s;
 }
-.auth-btn:hover:not(:disabled) { background: var(--accent-hover); border-color: var(--accent-hover); }
+.auth-btn:hover:not(:disabled) { background: var(--accent-btn-hover); border-color: var(--accent-btn-hover); }
 .auth-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
 /* messages */
