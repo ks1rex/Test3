@@ -76,15 +76,19 @@
 
 <div class="spacer"></div>
 
-<div class="panel row">
-  <label>С: <input id="rangeStart" type="number" min="1" value="1"></label>
-  <label>По: <input id="rangeEnd" type="number" min="1" value="1"></label>
-  <label><input id="shuffle" type="checkbox"> <i data-lucide="shuffle"></i> Перемешать</label>
-  <label><input id="hideVariants" type="checkbox"> Скрыть количество вариантов</label>
-  <button id="startBtn" class="btn-primary">Начать</button>
-  <button id="wrongOnlyBtn" disabled>Ошибочные → новый прогон</button>
-  <span class="pill">Шаг: <span id="stepInfo">—/—</span></span>
-  <span class="pill">Ошибок: <span id="wrongCount">0</span></span>
+<div class="panel controls-panel">
+  <div class="row controls-setup">
+    <label>С: <input id="rangeStart" type="number" min="1" value="1"></label>
+    <label>По: <input id="rangeEnd" type="number" min="1" value="1"></label>
+    <label><input id="shuffle" type="checkbox"> <i data-lucide="shuffle"></i> Перемешать</label>
+    <label><input id="hideVariants" type="checkbox"> Скрыть количество вариантов</label>
+    <button id="startBtn" class="btn-primary">Начать</button>
+  </div>
+  <div class="row controls-status">
+    <span class="pill">Шаг: <span id="stepInfo">—/—</span></span>
+    <span class="pill">Ошибок: <span id="wrongCount">0</span></span>
+    <button id="wrongOnlyBtn" disabled>Ошибочные → новый прогон</button>
+  </div>
 </div>
 
 <div class="spacer"></div>

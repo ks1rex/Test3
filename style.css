@@ -390,6 +390,10 @@ select:focus, input[type=number]:focus { outline: none; border-color: var(--acce
 label .lucide { width: 16px; height: 16px; }
 .password-toggle .lucide { width: 17px; height: 17px; }
 
+/* ===== CONTROLS PANEL ===== */
+.controls-panel { display: flex; flex-direction: column; }
+.controls-status { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border-color); }
+
 /* ===== MOBILE (≤480px) ===== */
 @media (max-width: 480px) {
   body { margin: 12px; }
