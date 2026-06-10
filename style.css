@@ -1,0 +1,55 @@
+:root {
+  --gap: 10px;
+  --bg-color: #1e1e1e;
+  --panel-color: #262626;
+  --text-color: #eaeaea;
+  --muted: #bdbdbd;
+  --button-bg: #323232;
+  --button-hover: #3c3c3c;
+  --button-text: #ffffff;
+  --accent: #6ba4ff;
+  --border-color: #444;
+}
+.light {
+  --bg-color: #ffffff;
+  --panel-color: #f4f4f4;
+  --text-color: #1e1e1e;
+  --muted: #555;
+  --button-bg: #e0e0e0;
+  --button-hover: #d5d5d5;
+  --button-text: #000;
+  --accent: #0066cc;
+  --border-color: #ccc;
+}
+body{
+  font-family: system-ui, sans-serif;
+  margin:20px;
+  background:var(--bg-color);
+  color:var(--text-color);
+}
+h2{margin:0 0 10px}
+.row{display:flex;gap:var(--gap);flex-wrap:wrap;align-items:center}
+.panel{border:1px solid var(--border-color);border-radius:12px;padding:12px;background:var(--panel-color)}
+#question{white-space:pre-line;font-weight:600;margin:10px 0}
+#answerInput{width:100%;min-height:110px;padding:10px;font-size:16px;background:var(--panel-color);color:var(--text-color);border:1px solid var(--border-color);border-radius:8px}
+button{padding:8px 12px;border:none;border-radius:10px;cursor:pointer;background:var(--button-bg);color:var(--button-text)}
+button:hover:not(:disabled){background:var(--button-hover)}
+button:disabled{opacity:.45;cursor:not-allowed}
+.pill{padding:4px 8px;border-radius:999px;background:var(--panel-color);color:var(--muted);border:1px solid var(--border-color)}
+.spacer{height:8px}
+#correctBox{white-space:pre-line;padding:10px;background:var(--panel-color);border:1px solid var(--border-color);border-radius:8px;color:var(--accent);display:none}
+#resultBox{display:none;font-weight:700;font-size:1.1em;padding:6px 10px;border-radius:8px;margin-bottom:8px}
+#resultBox.ok{color:#2e7d32;background:#e8f5e9;border:1px solid #a5d6a7}
+#resultBox.wrong{color:#c62828;background:#ffebee;border:1px solid #ef9a9a}
+.light #resultBox.ok{color:#1b5e20;background:#f1f8e9;border-color:#aed581}
+.light #resultBox.wrong{color:#b71c1c;background:#fff3e0;border-color:#ffcc80}
+
+select,
+input[type=number] {
+  background: var(--panel-color);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 6px;
+}
+#themeToggle{margin-left:auto}
