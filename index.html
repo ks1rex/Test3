@@ -46,6 +46,11 @@
   .pill{padding:4px 8px;border-radius:999px;background:var(--panel-color);color:var(--muted);border:1px solid var(--border-color)}
   .spacer{height:8px}
   #correctBox{white-space:pre-line;padding:10px;background:var(--panel-color);border:1px solid var(--border-color);border-radius:8px;color:var(--accent);display:none}
+  #resultBox{display:none;font-weight:700;font-size:1.1em;padding:6px 10px;border-radius:8px;margin-bottom:8px}
+  #resultBox.ok{color:#2e7d32;background:#e8f5e9;border:1px solid #a5d6a7}
+  #resultBox.wrong{color:#c62828;background:#ffebee;border:1px solid #ef9a9a}
+  .light #resultBox.ok{color:#1b5e20;background:#f1f8e9;border-color:#aed581}
+  .light #resultBox.wrong{color:#b71c1c;background:#fff3e0;border-color:#ffcc80}
 
 select,
 input[type=number] {
@@ -99,6 +104,7 @@ input[type=number] {
   </div>
 
   <div class="spacer"></div>
+  <div id="resultBox"></div>
   <div id="correctBox"></div>
 
   <div class="spacer"></div>
@@ -140,6 +146,7 @@ const answerContainer = document.getElementById("answerContainer");
 const stepInfo = document.getElementById("stepInfo");
 const wrongCount = document.getElementById("wrongCount");
 const hideVariantsElem = document.getElementById("hideVariants");
+const resultBox = document.getElementById("resultBox");
 /* ========== STATE ========== */
 let QA = [];
 let order = [];
@@ -258,6 +265,12 @@ function normalizeQuestion(text) {
   }
 
   return arr;
+}
+
+function showResult(isCorrect) {
+  resultBox.textContent = isCorrect ? "✅ Верно" : "❌ Неверно";
+  resultBox.className = isCorrect ? "ok" : "wrong";
+  resultBox.style.display = "block";
 }
 
 function fisherYates(arr) {
@@ -423,6 +436,9 @@ function showQA(){
   answerInput.value = "";
   correctBox.style.display = "none";
   correctBox.textContent = "";
+  resultBox.style.display = "none";
+  resultBox.textContent = "";
+  resultBox.className = "";
 
   updateButtons();
   showStep();
@@ -441,7 +457,7 @@ function showAnswer() {
   if (current.type === "single") {
     const selected = document.querySelector("input[name='answer']:checked");
     const selectedOriginalIndex = selected ? current._multiMap[parseInt(selected.value)] : -1;
-    alert(selectedOriginalIndex === current.correct ? "Верно" : "Неверно");
+    showResult(selectedOriginalIndex === current.correct);
   }
 
   if (current.type === "multi") {
@@ -453,7 +469,7 @@ function showAnswer() {
 
     const correct = current.correct.slice().sort().join(",");
 
-    alert(selected === correct ? "Верно" : "Неверно");
+    showResult(selected === correct);
   }
 
 
@@ -470,7 +486,7 @@ function showAnswer() {
       }
     });
 
-    alert(ok ? "Верно" : "Неверно");
+    showResult(ok);
   }
 
 
@@ -487,7 +503,7 @@ function showAnswer() {
       }
     });
 
-    alert(ok ? "Верно" : "Неверно");
+    showResult(ok);
   }
 
 
@@ -504,7 +520,7 @@ function showAnswer() {
       }
     });
 
-    alert(ok ? "Верно" : "Неверно");
+    showResult(ok);
   }
 
   let out = "Эталон:\n\n";
@@ -566,6 +582,9 @@ function showAnswer() {
 function hideAnswer() {
   correctBox.style.display = "none";
   correctBox.textContent = "";
+  resultBox.style.display = "none";
+  resultBox.textContent = "";
+  resultBox.className = "";
 
   markRightBtn.disabled = true;
   markWrongBtn.disabled = true;
