@@ -88,6 +88,9 @@ async function loadTopic(filename){
     return;
   }
 
+  questionBox.textContent = "Загрузка темы…";
+  startBtn.disabled = true;
+
   try {
     const resp = await fetch("topics/" + filename);
     if (!resp.ok) throw new Error("Файл темы не найден: " + filename);
@@ -547,12 +550,13 @@ nextBtn.onclick = () => { if (idx < order.length - 1) { idx++; showQA(); } };
 prevBtn.onclick = () => { if (idx > 0) { idx--; showQA(); } };
 
 /* ========== SCREENS ========== */
+const loadingScreen = document.getElementById("loadingScreen");
 const authScreen = document.getElementById("authScreen");
 const activationScreen = document.getElementById("activationScreen");
 const appScreen = document.getElementById("appScreen");
 
 function showScreen(screen) {
-  [authScreen, activationScreen, appScreen].forEach(s => { s.style.display = "none"; });
+  [loadingScreen, authScreen, activationScreen, appScreen].forEach(s => { s.style.display = "none"; });
   screen.style.display = "";
 }
 
@@ -653,7 +657,9 @@ authSubmitBtn.onclick = async () => {
   const password = authPassword.value;
   if (!email || !password) { showAuthError("Введите email и пароль."); return; }
 
+  const prevText = authSubmitBtn.textContent;
   authSubmitBtn.disabled = true;
+  authSubmitBtn.textContent = "Загрузка…";
   authError.style.display = "none";
 
   const { data, error } = isSignInMode
@@ -661,15 +667,14 @@ authSubmitBtn.onclick = async () => {
     : await signUp(email, password);
 
   authSubmitBtn.disabled = false;
+  authSubmitBtn.textContent = prevText;
 
   if (error) { showAuthError(translateAuthError(error.message)); return; }
 
   if (!isSignInMode) {
     if (data.session) {
-      // Email-подтверждение отключено в Supabase — сессия выдана сразу
       await initAccess();
     } else {
-      // Email-подтверждение включено — показываем уведомление
       showConfirmNotice(email);
     }
     return;
@@ -683,10 +688,13 @@ activateBtn.onclick = async () => {
   if (!code) { showActivationError("Введите код активации."); return; }
 
   activateBtn.disabled = true;
+  activateBtn.textContent = "Проверка…";
   activationError.style.display = "none";
 
   const ok = await redeemCode(code);
+
   activateBtn.disabled = false;
+  activateBtn.textContent = "Активировать";
 
   if (!ok) { showActivationError("Код недействителен или уже использован."); return; }
 
@@ -697,16 +705,21 @@ activateBtn.onclick = async () => {
 };
 
 signOutBtn.onclick = async () => {
+  signOutBtn.disabled = true;
   await signOut();
+  signOutBtn.disabled = false;
   showScreen(authScreen);
 };
 
 signOutFromActivation.onclick = async () => {
+  signOutFromActivation.disabled = true;
   await signOut();
+  signOutFromActivation.disabled = false;
   showScreen(authScreen);
 };
 
 async function initAccess() {
+  showScreen(loadingScreen);
   let result;
   try {
     result = await checkAccess();

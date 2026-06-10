@@ -54,6 +54,18 @@ input[type=number] {
 }
 #themeToggle{margin-left:auto}
 
+/* ===== LOADING SCREEN ===== */
+@keyframes dots {
+  0%, 20%  { content: ""; }
+  40%      { content: "."; }
+  60%      { content: ".."; }
+  80%, 100%{ content: "..."; }
+}
+.loading-dots::after {
+  content: "";
+  animation: dots 1.4s steps(1, end) infinite;
+}
+
 /* ===== AUTH / ACTIVATION SCREENS ===== */
 .screen-center {
   display: flex;
