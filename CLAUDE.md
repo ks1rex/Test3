@@ -67,8 +67,25 @@ For `single`/`multi`, options are shuffled via `shuffleArray()` on each `showQA(
 ## Adding a new topic
 
 1. Create `topics/<name>.json` following one of the formats above.
-2. Add an entry `{ "title": "…", "file": "<name>.json" }` to `topics_index.json`.
-3. The service worker will auto-cache it on next install.
+2. Add an entry `{ "title": "…", "file": "<name>.json" }` to `topics_index.json`
+   (2-space indent, field order `title` then `file`).
+3. **Run the validator** before committing:
+   ```
+   node validate-topics.js
+   ```
+   It checks every file in `topics/` and the index for structural errors and
+   prints `OK` or a list of issues. Fix all reported problems before pushing.
+4. The service worker will auto-cache it on next install.
+
+## Before committing topic changes
+
+Always run `node validate-topics.js` from the project root.
+Exit code 0 = clean; exit code 1 = issues found (listed on stdout).
+The script checks:
+- `topics_index.json` — all entries have `title`+`file`, files exist, no orphans
+- Each `topics/*.json` — valid JSON, correct top-level shape, required fields per
+  type, index bounds for `correct` / `correct_order`, permutation validity for
+  `sequence`, range 0–4 for `assertion`
 
 ## Deployment on GitHub Pages
 
