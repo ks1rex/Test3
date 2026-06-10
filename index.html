@@ -283,17 +283,19 @@ function showQA(){
   switch (current.type) {
 
   case "single":
-  case "multi":
+  case "multi": {
 
     const shuffledMulti = shuffleArray(current.options);
 
     current._multiMap = shuffledMulti.map(el => el.index);
 
+    const inputType = current.type === "single" ? "radio" : "checkbox";
+
     shuffledMulti.forEach((el, newIndex) => {
 
       const label = document.createElement("label");
       label.innerHTML = `
-        <input type="checkbox" name="answer" value="${newIndex}">
+        <input type="${inputType}" name="answer" value="${newIndex}">
         ${el.item}
       `;
 
@@ -302,6 +304,7 @@ function showQA(){
     });
 
     break;
+  }
 
   case "matching":
 
