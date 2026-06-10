@@ -12,18 +12,24 @@
 <div id="authScreen" class="screen-center">
   <div class="auth-card panel">
     <h2 class="auth-title">Тест-тренажёр</h2>
-    <div class="auth-tabs row">
-      <button id="tabSignIn" class="tab-btn tab-active">Вход</button>
-      <button id="tabSignUp" class="tab-btn">Регистрация</button>
+    <div id="authForm">
+      <div class="auth-tabs row">
+        <button id="tabSignIn" class="tab-btn tab-active">Вход</button>
+        <button id="tabSignUp" class="tab-btn">Регистрация</button>
+      </div>
+      <div id="authError" class="auth-msg auth-msg--error" style="display:none"></div>
+      <label class="auth-label">Email
+        <input id="authEmail" class="auth-input" type="email" autocomplete="email" placeholder="you@example.com">
+      </label>
+      <label class="auth-label">Пароль
+        <input id="authPassword" class="auth-input" type="password" autocomplete="current-password" placeholder="••••••••">
+      </label>
+      <button id="authSubmitBtn" class="auth-btn">Войти</button>
     </div>
-    <div id="authError" class="auth-msg auth-msg--error" style="display:none"></div>
-    <label class="auth-label">Email
-      <input id="authEmail" class="auth-input" type="email" autocomplete="email" placeholder="you@example.com">
-    </label>
-    <label class="auth-label">Пароль
-      <input id="authPassword" class="auth-input" type="password" autocomplete="current-password" placeholder="••••••••">
-    </label>
-    <button id="authSubmitBtn" class="auth-btn">Войти</button>
+    <div id="confirmNotice" style="display:none">
+      <div id="confirmText" class="auth-msg auth-msg--info"></div>
+      <button id="backToSignIn" class="auth-btn">Назад ко входу</button>
+    </div>
   </div>
 </div>
 

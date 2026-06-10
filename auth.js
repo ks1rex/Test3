@@ -4,6 +4,10 @@
 const SUPABASE_URL = 'YOUR_SUPABASE_URL';
 const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
 
+// detectSessionInUrl: true (default) — SDK автоматически подхватывает ?code= (PKCE)
+// или #access_token= (implicit) из URL при переходе по ссылке из письма.
+// getSession() ждёт завершения этого обмена внутри _initialize(), поэтому
+// вызов initAccess() сразу после загрузки страницы корректно получает сессию.
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 async function signUp(email, password) {
@@ -20,6 +24,12 @@ async function signOut() {
 
 async function getSession() {
   const { data } = await supabaseClient.auth.getSession();
+  // После успешного PKCE-обмена убираем ?code= из адресной строки,
+  // чтобы повторный рефреш не пытался использовать уже отработавший код.
+  if (data.session && window.location.search.includes('code=')) {
+    const clean = window.location.pathname + window.location.hash;
+    history.replaceState(null, '', clean);
+  }
   return data.session;
 }
 

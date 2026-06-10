@@ -133,6 +133,11 @@ input[type=number] {
   border-radius: 8px;
   font-size: 0.9em;
 }
+#authForm, #confirmNotice {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
 .auth-msg--error {
   color: #c62828;
   background: #ffebee;
@@ -140,6 +145,13 @@ input[type=number] {
 }
 .light .auth-msg--error {
   color: #b71c1c;
+}
+.auth-msg--info {
+  color: var(--accent);
+  background: var(--panel-color);
+  border: 1px solid var(--accent);
+  line-height: 1.6;
+  text-align: center;
 }
 .btn-link {
   background: none;

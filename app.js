@@ -568,6 +568,10 @@ const activateBtn = document.getElementById("activateBtn");
 const activationError = document.getElementById("activationError");
 const signOutBtn = document.getElementById("signOutBtn");
 const signOutFromActivation = document.getElementById("signOutFromActivation");
+const authForm = document.getElementById("authForm");
+const confirmNotice = document.getElementById("confirmNotice");
+const confirmText = document.getElementById("confirmText");
+const backToSignIn = document.getElementById("backToSignIn");
 
 let isSignInMode = true;
 
@@ -580,9 +584,30 @@ function setAuthMode(isSignIn) {
   authError.style.display = "none";
 }
 
+// Переводит типичные ошибки Supabase Auth в читаемый русский текст
+function translateAuthError(msg) {
+  const map = {
+    'Email not confirmed': 'Email не подтверждён — проверьте почту и перейдите по ссылке из письма.',
+    'Invalid login credentials': 'Неверный email или пароль.',
+    'User already registered': 'Этот email уже зарегистрирован.',
+    'Password should be at least 6 characters': 'Пароль должен содержать минимум 6 символов.',
+    'Unable to validate email address: invalid format': 'Некорректный формат email.',
+    'Email rate limit exceeded': 'Слишком много попыток. Попробуйте позже.',
+  };
+  return map[msg] ?? msg;
+}
+
 function showAuthError(msg) {
   authError.textContent = msg;
   authError.style.display = "block";
+}
+
+// Скрывает форму и показывает уведомление о письме с подтверждением
+function showConfirmNotice(email) {
+  authForm.style.display = "none";
+  confirmText.textContent =
+    `Мы отправили письмо на ${email}. Перейдите по ссылке в письме для подтверждения регистрации, затем войдите на этой странице.`;
+  confirmNotice.style.display = "";
 }
 
 function showActivationError(msg) {
@@ -592,6 +617,12 @@ function showActivationError(msg) {
 
 tabSignIn.onclick = () => setAuthMode(true);
 tabSignUp.onclick = () => setAuthMode(false);
+
+backToSignIn.onclick = () => {
+  confirmNotice.style.display = "none";
+  authForm.style.display = "";
+  setAuthMode(true);
+};
 
 authSubmitBtn.onclick = async () => {
   const email = authEmail.value.trim();
@@ -607,14 +638,15 @@ authSubmitBtn.onclick = async () => {
 
   authSubmitBtn.disabled = false;
 
-  if (error) { showAuthError(error.message); return; }
+  if (error) { showAuthError(translateAuthError(error.message)); return; }
 
   if (!isSignInMode) {
     if (data.session) {
+      // Email-подтверждение отключено в Supabase — сессия выдана сразу
       await initAccess();
     } else {
-      showAuthError("Регистрация успешна. Подтвердите email, затем войдите.");
-      setAuthMode(true);
+      // Email-подтверждение включено — показываем уведомление
+      showConfirmNotice(email);
     }
     return;
   }
