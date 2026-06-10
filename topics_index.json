@@ -1,0 +1,47 @@
+[
+  {
+    "title": "Физиология",
+    "file": "physiology.json"
+  },
+  {
+    "title": "Биохимия 2 этап",
+    "file": "biochem2.json"
+    
+  },
+  {
+  "file": "farma1.json",
+  "title": "Фармакология 1"
+  },
+  {
+  "file": "farma2.json",
+  "title": "Фармакология 2"
+  },
+  {
+  "file": "farma3.json",
+  "title": "Фармакология 3"
+  },
+  {
+  "file": "farma4.json",
+  "title": "Фармакология 4"
+  },
+  { 
+    "title": "Микробиология частная", 
+    "file": "mikra1.json" 
+  
+  },
+  { 
+    "title": "Микробиология 1 этап", 
+    "file": "microbiology.json" 
+  
+  },
+  { 
+    "title": "Пропед задачи", 
+    "file": "proped.json" 
+  
+  },
+  { 
+    "title": "Микробиология общая", 
+    "file": "mikra.json" 
+  
+  }
+]
