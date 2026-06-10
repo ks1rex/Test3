@@ -393,6 +393,30 @@ label .lucide { width: 16px; height: 16px; }
 /* ===== CONTROLS PANEL ===== */
 .controls-panel { display: flex; flex-direction: column; }
 .controls-status { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border-color); }
+.range-error {
+  margin-top: 6px;
+  padding: 7px 10px;
+  border-radius: var(--radius-input);
+  font-size: 0.87em;
+  color: var(--error);
+  background: var(--error-bg);
+  border: 1px solid var(--error-border);
+}
+
+/* ===== FIRST-RUN HINT ===== */
+.first-run-hint {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  margin-bottom: 14px;
+  padding: 9px 11px;
+  border: 1px dashed var(--border-color);
+  border-radius: var(--radius-input);
+  font-size: 0.875em;
+  color: var(--muted);
+}
+.first-run-sep { opacity: 0.45; flex-shrink: 0; }
 
 /* ===== MOBILE (≤480px) ===== */
 @media (max-width: 480px) {

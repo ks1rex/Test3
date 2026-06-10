@@ -84,6 +84,7 @@
     <label><input id="hideVariants" type="checkbox"> Скрыть количество вариантов</label>
     <button id="startBtn" class="btn-primary">Начать</button>
   </div>
+  <div id="rangeError" class="range-error" style="display:none"></div>
   <div class="row controls-status">
     <span class="pill">Шаг: <span id="stepInfo">—/—</span></span>
     <span class="pill">Ошибок: <span id="wrongCount">0</span></span>
@@ -95,6 +96,13 @@
 
 <div class="panel">
   <div id="question">Выберите тему</div>
+  <div id="firstRunHint" class="first-run-hint" style="display:none">
+    <span>1.&nbsp;Выберите тему</span>
+    <span class="first-run-sep">→</span>
+    <span>2.&nbsp;Настройте диапазон (С&nbsp;/&nbsp;По)</span>
+    <span class="first-run-sep">→</span>
+    <span>3.&nbsp;Нажмите <strong>«Начать»</strong></span>
+  </div>
   <textarea id="answerInput" placeholder="Ваш ответ..."></textarea>
   <div id="answerContainer"></div>
 

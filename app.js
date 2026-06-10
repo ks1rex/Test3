@@ -38,6 +38,8 @@ const stepInfo = document.getElementById("stepInfo");
 const wrongCount = document.getElementById("wrongCount");
 const hideVariantsElem = document.getElementById("hideVariants");
 const resultBox = document.getElementById("resultBox");
+const firstRunHint = document.getElementById("firstRunHint");
+const rangeError = document.getElementById("rangeError");
 /* ========== STATE ========== */
 let QA = [];
 let order = [];
@@ -92,11 +94,14 @@ async function loadTopic(filename){
     QA = [];
     questionBox.textContent = "Выберите тему";
     correctBox.style.display = "none";
+    firstRunHint.style.display = "";
     updateButtons();
     return;
   }
 
   questionBox.textContent = "Загрузка темы…";
+  firstRunHint.style.display = "none";
+  rangeError.style.display = "none";
   startBtn.disabled = true;
 
   try {
@@ -116,6 +121,7 @@ async function loadTopic(filename){
     rangeStartElem.value = 1;
     rangeEndElem.value = QA.length || 1;
     questionBox.textContent = "Нажмите «Начать»";
+    firstRunHint.style.display = "";
     correctBox.style.display = "none";
     correctBox.textContent = "";
     updateButtons();
@@ -180,6 +186,7 @@ function fisherYates(arr) {
 /* ========== SHOW QA ========== */
 function showQA(){
   if(!order.length){
+    firstRunHint.style.display = "";
     questionBox.textContent = "Нажмите «Начать»";
     answerInput.value = "";
     answerContainer.innerHTML = "";
@@ -191,6 +198,7 @@ function showQA(){
     return;
   }
 
+  firstRunHint.style.display = "none";
   const currentIndex = order[idx];
   const current = QA[currentIndex];
   if (!current) return;
@@ -521,12 +529,14 @@ function updateButtons(){
 
 /* ========== BUTTON HANDLERS ========== */
 startBtn.onclick = () => {
+  rangeError.style.display = "none";
   const start = Math.max(1, parseInt(rangeStartElem.value || 1)) - 1;
   let end = Math.min(QA.length, parseInt(rangeEndElem.value || QA.length));
   if (isNaN(start) || isNaN(end) || start < 0 || end <= start) {
-    return alert("Неверный диапазон. Убедитесь, что 'С' < 'По' и в пределах доступных вопросов.");
+    rangeError.textContent = "Неверный диапазон: «С» должно быть меньше «По» и не выходить за пределы списка.";
+    rangeError.style.display = "";
+    return;
   }
-
   buildOrder(start, end);
   showQA();
 };
@@ -746,6 +756,7 @@ function resetAppState() {
   topicSelect.onchange = null;
 
   questionBox.textContent = "Выберите тему";
+  firstRunHint.style.display = "";
   answerInput.value = "";
   answerInput.style.display = "none";
   answerContainer.innerHTML = "";
