@@ -702,6 +702,8 @@ authSubmitBtn.onclick = async () => {
   if (error) { showAuthError(translateAuthError(error.message)); return; }
 
   if (!isSignInMode) {
+    // Supabase returns a session immediately when email confirmation is disabled.
+    // If it's enabled (future), data.session is null and we show the "check your inbox" notice.
     if (data.session) {
       await initAccess();
     } else {
