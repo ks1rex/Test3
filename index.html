@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8">
-<title>Тест-тренажёр </title>
+<title>МедТест</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="style.css">
 </head>
@@ -16,7 +16,7 @@
 <!-- ===== AUTH SCREEN ===== -->
 <div id="authScreen" class="screen-center" style="display:none">
   <div class="auth-card panel">
-    <h2 class="auth-title">Тест-тренажёр</h2>
+    <h2 class="auth-title brand-title">Мед<span class="brand-accent">Тест</span></h2>
     <div id="authForm">
       <div class="auth-tabs row">
         <button id="tabSignIn" class="tab-btn tab-active">Вход</button>
@@ -46,7 +46,8 @@
 <div id="activationScreen" class="screen-center" style="display:none">
   <div class="auth-card panel">
     <div class="activation-icon"><i data-lucide="lock"></i></div>
-    <h2 class="auth-title">Активация доступа</h2>
+    <h2 class="auth-title brand-title">Мед<span class="brand-accent">Тест</span></h2>
+    <p class="auth-subtitle">Активация доступа</p>
     <p id="activationHint" class="auth-hint">Введите код активации, чтобы получить доступ к тренажёру.</p>
     <div id="activationError" class="auth-msg auth-msg--error" style="display:none"></div>
     <label class="auth-label">Код активации
@@ -60,11 +61,11 @@
 <!-- ===== APP SCREEN ===== -->
 <div id="appScreen" style="display:none">
 
-<div class="row">
-  <h2>Тест-тренажёр</h2>
-  <button id="themeToggle" aria-label="Переключить тему"><i data-lucide="moon"></i></button>
-  <span id="accessPill" class="pill" style="display:none"></span>
-  <button id="signOutBtn"><i data-lucide="log-out"></i> Выйти</button>
+<div class="row app-header">
+  <h2 class="brand-title">Мед<span class="brand-accent">Тест</span></h2>
+  <button id="themeToggle" class="btn-icon" aria-label="Переключить тему"><i data-lucide="moon"></i></button>
+  <span id="accessPill" class="pill access-pill" style="display:none"></span>
+  <button id="signOutBtn" class="btn-outline"><i data-lucide="log-out"></i> Выйти</button>
 </div>
 
 <div class="panel row">
@@ -80,7 +81,7 @@
   <label>По: <input id="rangeEnd" type="number" min="1" value="1"></label>
   <label><input id="shuffle" type="checkbox"> <i data-lucide="shuffle"></i> Перемешать</label>
   <label><input id="hideVariants" type="checkbox"> Скрыть количество вариантов</label>
-  <button id="startBtn">Начать</button>
+  <button id="startBtn" class="btn-primary">Начать</button>
   <button id="wrongOnlyBtn" disabled>Ошибочные → новый прогон</button>
   <span class="pill">Шаг: <span id="stepInfo">—/—</span></span>
   <span class="pill">Ошибок: <span id="wrongCount">0</span></span>
@@ -94,7 +95,7 @@
   <div id="answerContainer"></div>
 
   <div class="row">
-    <button id="checkBtn" disabled>Показать ответ</button>
+    <button id="checkBtn" class="btn-primary" disabled>Показать ответ</button>
     <button id="markRightBtn" disabled>Верно</button>
     <button id="markWrongBtn" disabled>Неверно</button>
   </div>
@@ -105,8 +106,8 @@
 
   <div class="spacer"></div>
   <div class="row">
-    <button id="prevBtn" disabled><i data-lucide="chevron-left"></i> Назад</button>
-    <button id="nextBtn" disabled>Вперёд <i data-lucide="chevron-right"></i></button>
+    <button id="prevBtn" class="btn-outline" disabled><i data-lucide="chevron-left"></i> Назад</button>
+    <button id="nextBtn" class="btn-outline" disabled>Вперёд <i data-lucide="chevron-right"></i></button>
   </div>
 </div>
 
