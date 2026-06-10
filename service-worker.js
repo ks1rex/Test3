@@ -1,17 +1,32 @@
 
-const CACHE_NAME = 'test-trainer-v1';
+const CACHE_NAME = 'test-trainer-v2';
 const ASSETS = [
-  '/',
+  './',
   'index.html',
   'manifest.json',
   'icon-192.png',
   'icon-512.png',
-  'apple-touch-icon.png'
+  'apple-touch-icon.png',
+  'topics_index.json'
 ];
 
 self.addEventListener('install', (evt) => {
   evt.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
+    caches.open(CACHE_NAME).then(async (cache) => {
+      await cache.addAll(ASSETS);
+      try {
+        const resp = await fetch('topics_index.json');
+        if (resp.ok) {
+          const topics = await resp.json();
+          const topicUrls = topics
+            .filter(t => t.file)
+            .map(t => 'topics/' + t.file);
+          await cache.addAll(topicUrls);
+        }
+      } catch (e) {
+        console.warn('SW: не удалось закэшировать топики', e);
+      }
+    })
   );
   self.skipWaiting();
 });
