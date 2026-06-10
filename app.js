@@ -546,8 +546,122 @@ markWrongBtn.onclick = () => {
 nextBtn.onclick = () => { if (idx < order.length - 1) { idx++; showQA(); } };
 prevBtn.onclick = () => { if (idx > 0) { idx--; showQA(); } };
 
+/* ========== SCREENS ========== */
+const authScreen = document.getElementById("authScreen");
+const activationScreen = document.getElementById("activationScreen");
+const appScreen = document.getElementById("appScreen");
+
+function showScreen(screen) {
+  [authScreen, activationScreen, appScreen].forEach(s => { s.style.display = "none"; });
+  screen.style.display = "";
+}
+
+/* ========== AUTH REFS & STATE ========== */
+const tabSignIn = document.getElementById("tabSignIn");
+const tabSignUp = document.getElementById("tabSignUp");
+const authEmail = document.getElementById("authEmail");
+const authPassword = document.getElementById("authPassword");
+const authSubmitBtn = document.getElementById("authSubmitBtn");
+const authError = document.getElementById("authError");
+const codeInput = document.getElementById("codeInput");
+const activateBtn = document.getElementById("activateBtn");
+const activationError = document.getElementById("activationError");
+const signOutBtn = document.getElementById("signOutBtn");
+const signOutFromActivation = document.getElementById("signOutFromActivation");
+
+let isSignInMode = true;
+
+function setAuthMode(isSignIn) {
+  isSignInMode = isSignIn;
+  tabSignIn.classList.toggle("tab-active", isSignIn);
+  tabSignUp.classList.toggle("tab-active", !isSignIn);
+  authSubmitBtn.textContent = isSignIn ? "Войти" : "Зарегистрироваться";
+  authPassword.autocomplete = isSignIn ? "current-password" : "new-password";
+  authError.style.display = "none";
+}
+
+function showAuthError(msg) {
+  authError.textContent = msg;
+  authError.style.display = "block";
+}
+
+function showActivationError(msg) {
+  activationError.textContent = msg;
+  activationError.style.display = "block";
+}
+
+tabSignIn.onclick = () => setAuthMode(true);
+tabSignUp.onclick = () => setAuthMode(false);
+
+authSubmitBtn.onclick = async () => {
+  const email = authEmail.value.trim();
+  const password = authPassword.value;
+  if (!email || !password) { showAuthError("Введите email и пароль."); return; }
+
+  authSubmitBtn.disabled = true;
+  authError.style.display = "none";
+
+  const { data, error } = isSignInMode
+    ? await signIn(email, password)
+    : await signUp(email, password);
+
+  authSubmitBtn.disabled = false;
+
+  if (error) { showAuthError(error.message); return; }
+
+  if (!isSignInMode) {
+    if (data.session) {
+      await initAccess();
+    } else {
+      showAuthError("Регистрация успешна. Подтвердите email, затем войдите.");
+      setAuthMode(true);
+    }
+    return;
+  }
+
+  await initAccess();
+};
+
+activateBtn.onclick = async () => {
+  const code = codeInput.value.trim();
+  if (!code) { showActivationError("Введите код активации."); return; }
+
+  activateBtn.disabled = true;
+  activationError.style.display = "none";
+
+  const ok = await redeemCode(code);
+  activateBtn.disabled = false;
+
+  if (!ok) { showActivationError("Код недействителен или уже использован."); return; }
+
+  showScreen(appScreen);
+  loadTopicList();
+};
+
+signOutBtn.onclick = async () => {
+  await signOut();
+  showScreen(authScreen);
+};
+
+signOutFromActivation.onclick = async () => {
+  await signOut();
+  showScreen(authScreen);
+};
+
+async function initAccess() {
+  const { loggedIn, hasAccess } = await checkAccess();
+  if (!loggedIn) {
+    showScreen(authScreen);
+  } else if (!hasAccess) {
+    showScreen(activationScreen);
+  } else {
+    showScreen(appScreen);
+    loadTopicList();
+  }
+}
+
 /* ========== INIT ========== */
-loadTopicList();
+initAccess();
 /* ========== KEYBOARD SHORTCUTS (fixed toggle) ========== */
 document.addEventListener("keydown", (e) => {
   if (document.activeElement === answerInput) {
