@@ -177,3 +177,45 @@ input[type=number] {
   color: var(--text-color);
   background: none;
 }
+
+/* ===== MOBILE (≤480px) ===== */
+@media (max-width: 480px) {
+  body { margin: 12px; }
+
+  /* Минимальный размер тапа 44px для всех кнопок */
+  button { min-height: 44px; }
+
+  /* Pill-теги в хедере не вылезают за экран */
+  .pill { font-size: 0.82em; }
+
+  /* Контролы викторины — более компактные отступы */
+  .row { gap: 6px; }
+
+  /* Теги тем — на всю ширину */
+  select { width: 100%; max-width: 100%; box-sizing: border-box; }
+
+  /* Строки matching: «термин → <select>» — стекируем вертикально */
+  #answerContainer > div {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    margin-bottom: 8px;
+  }
+
+  /* Выпадашки и текстовые поля внутри answerContainer — на всю ширину */
+  #answerContainer select,
+  #answerContainer input[type='text'] {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  /* Поле порядка в sequence — достаточно узкое числовое поле */
+  #answerContainer input[type='number'] {
+    width: 64px;
+    min-height: 36px;
+  }
+
+  /* auth-card не прижимается к краям экрана */
+  .auth-card { margin: 0 4px; }
+}
