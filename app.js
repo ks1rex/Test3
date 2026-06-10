@@ -710,9 +710,39 @@ activateBtn.onclick = async () => {
   loadTopicList();
 };
 
+function resetAppState() {
+  QA = [];
+  order = [];
+  idx = 0;
+  wrongSet.clear();
+
+  topicSelect.innerHTML = "";
+  topicSelect.onchange = null;
+
+  questionBox.textContent = "Выберите тему";
+  answerInput.value = "";
+  answerInput.style.display = "none";
+  answerContainer.innerHTML = "";
+  correctBox.style.display = "none";
+  correctBox.textContent = "";
+  resultBox.style.display = "none";
+  resultBox.textContent = "";
+  resultBox.className = "";
+
+  rangeStartElem.value = 1;
+  rangeEndElem.value = 1;
+
+  accessPill.style.display = "none";
+  accessPill.textContent = "";
+
+  updateButtons();
+  showStep();
+}
+
 signOutBtn.onclick = async () => {
   signOutBtn.disabled = true;
   await signOut();
+  resetAppState();
   signOutBtn.disabled = false;
   showScreen(authScreen);
 };
