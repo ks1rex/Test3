@@ -578,6 +578,7 @@ const authForm = document.getElementById("authForm");
 const confirmNotice = document.getElementById("confirmNotice");
 const confirmText = document.getElementById("confirmText");
 const backToSignIn = document.getElementById("backToSignIn");
+const passwordHint = document.getElementById("passwordHint");
 
 let isSignInMode = true;
 
@@ -588,6 +589,7 @@ function setAuthMode(isSignIn) {
   authSubmitBtn.textContent = isSignIn ? "Войти" : "Зарегистрироваться";
   authPassword.autocomplete = isSignIn ? "current-password" : "new-password";
   authError.style.display = "none";
+  passwordHint.style.display = isSignIn ? "none" : "";
 }
 
 function formatDate(isoStr) {
@@ -655,7 +657,19 @@ backToSignIn.onclick = () => {
 authSubmitBtn.onclick = async () => {
   const email = authEmail.value.trim();
   const password = authPassword.value;
-  if (!email || !password) { showAuthError("Введите email и пароль."); return; }
+
+  if (!email || !/.+@.+\..+/.test(email)) {
+    showAuthError("Введите корректный email-адрес.");
+    return;
+  }
+  if (!password) {
+    showAuthError("Введите пароль.");
+    return;
+  }
+  if (!isSignInMode && password.length < 6) {
+    showAuthError("Пароль должен содержать минимум 6 символов.");
+    return;
+  }
 
   const prevText = authSubmitBtn.textContent;
   authSubmitBtn.disabled = true;
