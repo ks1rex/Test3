@@ -1,10 +1,10 @@
 {
-  "name": "Тест-тренажёр (вопросы: 600)",
-  "short_name": "Тренажёр",
+  "name": "МедТест",
+  "short_name": "МедТест",
   "start_url": ".",
   "display": "standalone",
-  "background_color": "#1e1e1e",
-  "theme_color": "#1e1e1e",
+  "background_color": "#1a2332",
+  "theme_color": "#1a2332",
   "icons": [
     {
       "src": "icon-192.png",
