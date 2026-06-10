@@ -2,7 +2,7 @@
 
 // Замените значения на ваши реальные данные из Supabase → Project Settings → API
 const SUPABASE_URL = 'https://bsmfzknssbjuggicmxgw.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_eaN0ScCMN2VMj-PFPRUq8Q_bXymwBdU';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJzbWZ6a25zc2JqdWdnaWNteGd3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExMTg1NjAsImV4cCI6MjA5NjY5NDU2MH0.PByAODC0E2wUKtKr7r3oAJrSRqfbuotjRPhiTyF8N9A';
 
 // detectSessionInUrl: true (default) — SDK автоматически подхватывает ?code= (PKCE)
 // или #access_token= (implicit) из URL при переходе по ссылке из письма.
