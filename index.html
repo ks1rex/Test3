@@ -37,7 +37,7 @@
 <div id="activationScreen" class="screen-center" style="display:none">
   <div class="auth-card panel">
     <h2 class="auth-title">Активация доступа</h2>
-    <p class="auth-hint">Введите код активации, чтобы получить доступ к тренажёру.</p>
+    <p id="activationHint" class="auth-hint">Введите код активации, чтобы получить доступ к тренажёру.</p>
     <div id="activationError" class="auth-msg auth-msg--error" style="display:none"></div>
     <label class="auth-label">Код активации
       <input id="codeInput" class="auth-input" type="text" placeholder="XXXX-XXXX">
@@ -53,6 +53,7 @@
 <div class="row">
   <h2>Тест-тренажёр</h2>
   <button id="themeToggle">🌙/☀️</button>
+  <span id="accessPill" class="pill" style="display:none"></span>
   <button id="signOutBtn">Выйти</button>
 </div>
 

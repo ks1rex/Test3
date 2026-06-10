@@ -35,16 +35,19 @@ async function getSession() {
 
 async function checkAccess() {
   const session = await getSession();
-  if (!session) return { loggedIn: false, hasAccess: false };
+  if (!session) return { loggedIn: false, hasAccess: false, expiresAt: null };
 
   const { data, error } = await supabaseClient
     .from('profiles')
-    .select('has_access')
+    .select('access_expires_at')
     .eq('id', session.user.id)
     .single();
 
-  if (error || !data) return { loggedIn: true, hasAccess: false };
-  return { loggedIn: true, hasAccess: data.has_access === true };
+  if (error || !data) return { loggedIn: true, hasAccess: false, expiresAt: null };
+
+  const expiresAt = data.access_expires_at ?? null;
+  const hasAccess = expiresAt !== null && new Date(expiresAt) > new Date();
+  return { loggedIn: true, hasAccess, expiresAt };
 }
 
 async function redeemCode(code) {

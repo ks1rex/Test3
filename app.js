@@ -568,6 +568,8 @@ const activateBtn = document.getElementById("activateBtn");
 const activationError = document.getElementById("activationError");
 const signOutBtn = document.getElementById("signOutBtn");
 const signOutFromActivation = document.getElementById("signOutFromActivation");
+const accessPill = document.getElementById("accessPill");
+const activationHint = document.getElementById("activationHint");
 const authForm = document.getElementById("authForm");
 const confirmNotice = document.getElementById("confirmNotice");
 const confirmText = document.getElementById("confirmText");
@@ -582,6 +584,19 @@ function setAuthMode(isSignIn) {
   authSubmitBtn.textContent = isSignIn ? "Войти" : "Зарегистрироваться";
   authPassword.autocomplete = isSignIn ? "current-password" : "new-password";
   authError.style.display = "none";
+}
+
+function formatDate(isoStr) {
+  const d = new Date(isoStr);
+  return String(d.getDate()).padStart(2, '0') + '.' +
+         String(d.getMonth() + 1).padStart(2, '0') + '.' +
+         d.getFullYear();
+}
+
+function updateAccessPill(expiresAt) {
+  if (!expiresAt) { accessPill.style.display = "none"; return; }
+  accessPill.textContent = "Доступ до " + formatDate(expiresAt);
+  accessPill.style.display = "";
 }
 
 // Переводит типичные ошибки Supabase Auth в читаемый русский текст
@@ -666,6 +681,8 @@ activateBtn.onclick = async () => {
 
   if (!ok) { showActivationError("Код недействителен или уже использован."); return; }
 
+  const { expiresAt } = await checkAccess();
+  updateAccessPill(expiresAt);
   showScreen(appScreen);
   loadTopicList();
 };
@@ -681,12 +698,16 @@ signOutFromActivation.onclick = async () => {
 };
 
 async function initAccess() {
-  const { loggedIn, hasAccess } = await checkAccess();
+  const { loggedIn, hasAccess, expiresAt } = await checkAccess();
   if (!loggedIn) {
     showScreen(authScreen);
   } else if (!hasAccess) {
+    activationHint.textContent = expiresAt !== null
+      ? `Срок действия доступа истёк ${formatDate(expiresAt)}. Введите новый код для продления.`
+      : "Введите код активации, чтобы получить доступ к тренажёру.";
     showScreen(activationScreen);
   } else {
+    updateAccessPill(expiresAt);
     showScreen(appScreen);
     loadTopicList();
   }
