@@ -430,6 +430,12 @@ function showAnswer() {
 
   // ===== ПРОВЕРКИ =====
 
+  if (current.type === "single") {
+    const selected = document.querySelector("input[name='answer']:checked");
+    const selectedOriginalIndex = selected ? current._multiMap[parseInt(selected.value)] : -1;
+    alert(selectedOriginalIndex === current.correct ? "Верно" : "Неверно");
+  }
+
   if (current.type === "multi") {
 
     const selected = [...document.querySelectorAll("input[name='answer']:checked")]
