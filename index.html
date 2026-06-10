@@ -501,18 +501,6 @@ function showAnswer() {
 
   let out = "Эталон:\n\n";
 
-  if (current.type === "multi") {
-
-    const selected = [...document.querySelectorAll("input[name='answer']:checked")]
-      .map(el => current._multiMap[parseInt(el.value)])
-      .sort()
-      .join(",");
-
-    const correct = current.correct.slice().sort().join(",");
-
-    alert(selected === correct ? "Верно" : "Неверно");
-  }
-
   if (current.type === "single" || current.type === "multi") {
     const arr = Array.isArray(current.correct) ? current.correct : [current.correct];
     arr.forEach(i => {
