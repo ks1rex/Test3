@@ -27,7 +27,10 @@
         <input id="authEmail" class="auth-input" type="email" autocomplete="email" placeholder="you@example.com">
       </label>
       <label class="auth-label">Пароль
-        <input id="authPassword" class="auth-input" type="password" autocomplete="current-password" placeholder="••••••••">
+        <div class="auth-input-wrap">
+          <input id="authPassword" class="auth-input" type="password" autocomplete="current-password" placeholder="••••••••">
+          <button type="button" id="passwordToggle" class="password-toggle" aria-label="Показать пароль"><i data-lucide="eye"></i></button>
+        </div>
       </label>
       <p id="passwordHint" class="auth-hint" style="display:none">Минимум 6 символов</p>
       <button id="authSubmitBtn" class="auth-btn">Войти</button>
@@ -42,6 +45,7 @@
 <!-- ===== ACTIVATION SCREEN ===== -->
 <div id="activationScreen" class="screen-center" style="display:none">
   <div class="auth-card panel">
+    <div class="activation-icon"><i data-lucide="lock"></i></div>
     <h2 class="auth-title">Активация доступа</h2>
     <p id="activationHint" class="auth-hint">Введите код активации, чтобы получить доступ к тренажёру.</p>
     <div id="activationError" class="auth-msg auth-msg--error" style="display:none"></div>
@@ -58,9 +62,9 @@
 
 <div class="row">
   <h2>Тест-тренажёр</h2>
-  <button id="themeToggle">🌙/☀️</button>
+  <button id="themeToggle" aria-label="Переключить тему"><i data-lucide="moon"></i></button>
   <span id="accessPill" class="pill" style="display:none"></span>
-  <button id="signOutBtn">Выйти</button>
+  <button id="signOutBtn"><i data-lucide="log-out"></i> Выйти</button>
 </div>
 
 <div class="panel row">
@@ -74,7 +78,7 @@
 <div class="panel row">
   <label>С: <input id="rangeStart" type="number" min="1" value="1"></label>
   <label>По: <input id="rangeEnd" type="number" min="1" value="1"></label>
-  <label><input id="shuffle" type="checkbox"> Перемешать</label>
+  <label><input id="shuffle" type="checkbox"> <i data-lucide="shuffle"></i> Перемешать</label>
   <label><input id="hideVariants" type="checkbox"> Скрыть количество вариантов</label>
   <button id="startBtn">Начать</button>
   <button id="wrongOnlyBtn" disabled>Ошибочные → новый прогон</button>
@@ -101,14 +105,15 @@
 
   <div class="spacer"></div>
   <div class="row">
-    <button id="prevBtn" disabled>Назад</button>
-    <button id="nextBtn" disabled>Вперёд</button>
+    <button id="prevBtn" disabled><i data-lucide="chevron-left"></i> Назад</button>
+    <button id="nextBtn" disabled>Вперёд <i data-lucide="chevron-right"></i></button>
   </div>
 </div>
 
 </div><!-- /#appScreen -->
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 <script src="auth.js"></script>
 <script src="app.js"></script>
 </body>

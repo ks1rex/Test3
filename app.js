@@ -3,9 +3,17 @@
 const body = document.body;
 const themeToggle = document.getElementById("themeToggle");
 if (localStorage.getItem("theme") === "light") body.classList.add("light");
+// sync icon to initial theme before lucide.createIcons() runs at end of file
+(function() {
+  const i = themeToggle.querySelector("i");
+  if (i) i.dataset.lucide = body.classList.contains("light") ? "sun" : "moon";
+})();
 themeToggle.onclick = () => {
   body.classList.toggle("light");
-  localStorage.setItem("theme", body.classList.contains("light") ? "light" : "dark");
+  const isLight = body.classList.contains("light");
+  localStorage.setItem("theme", isLight ? "light" : "dark");
+  const i = themeToggle.querySelector("i");
+  if (i) { i.dataset.lucide = isLight ? "sun" : "moon"; lucide.createIcons(); }
 };
 
 /* ========== DOM REFS ========== */
@@ -154,9 +162,12 @@ function shuffleArray(array) {
 }
 
 function showResult(isCorrect) {
-  resultBox.textContent = isCorrect ? "✅ Верно" : "❌ Неверно";
+  resultBox.innerHTML = isCorrect
+    ? '<i data-lucide="check"></i> Верно'
+    : '<i data-lucide="x"></i> Неверно';
   resultBox.className = isCorrect ? "ok" : "wrong";
   resultBox.style.display = "block";
+  lucide.createIcons();
 }
 
 function fisherYates(arr) {
@@ -571,6 +582,7 @@ const confirmNotice = document.getElementById("confirmNotice");
 const confirmText = document.getElementById("confirmText");
 const backToSignIn = document.getElementById("backToSignIn");
 const passwordHint = document.getElementById("passwordHint");
+const passwordToggle = document.getElementById("passwordToggle");
 
 let isSignInMode = true;
 
@@ -582,6 +594,10 @@ function setAuthMode(isSignIn) {
   authPassword.autocomplete = isSignIn ? "current-password" : "new-password";
   authError.style.display = "none";
   passwordHint.style.display = isSignIn ? "none" : "";
+  // reset password visibility on tab switch
+  authPassword.type = "password";
+  const pi = passwordToggle.querySelector("i");
+  if (pi) { pi.dataset.lucide = "eye"; lucide.createIcons(); }
 }
 
 function formatDate(isoStr) {
@@ -593,8 +609,9 @@ function formatDate(isoStr) {
 
 function updateAccessPill(expiresAt) {
   if (!expiresAt) { accessPill.style.display = "none"; return; }
-  accessPill.textContent = "Доступ до " + formatDate(expiresAt);
+  accessPill.innerHTML = `<i data-lucide="clock"></i> Доступ до ${formatDate(expiresAt)}`;
   accessPill.style.display = "";
+  lucide.createIcons();
 }
 
 // Переводит типичные ошибки Supabase Auth в читаемый русский текст
@@ -644,6 +661,13 @@ backToSignIn.onclick = () => {
   confirmNotice.style.display = "none";
   authForm.style.display = "";
   setAuthMode(true);
+};
+
+passwordToggle.onclick = () => {
+  const isHidden = authPassword.type === "password";
+  authPassword.type = isHidden ? "text" : "password";
+  const pi = passwordToggle.querySelector("i");
+  if (pi) { pi.dataset.lucide = isHidden ? "eye-off" : "eye"; lucide.createIcons(); }
 };
 
 authSubmitBtn.onclick = async () => {
@@ -800,3 +824,6 @@ document.addEventListener("keydown", (e) => {
     if (!nextBtn.disabled) nextBtn.click();
   }
 });
+
+/* ========== LUCIDE ICONS INIT ========== */
+lucide.createIcons();
