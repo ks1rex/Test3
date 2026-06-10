@@ -1,8 +1,8 @@
 "use strict";
 
 // Замените значения на ваши реальные данные из Supabase → Project Settings → API
-const SUPABASE_URL = 'YOUR_SUPABASE_URL';
-const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+const SUPABASE_URL = 'https://bsmfzknssbjuggicmxgw.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_eaN0ScCMN2VMj-PFPRUq8Q_bXymwBdU';
 
 // detectSessionInUrl: true (default) — SDK автоматически подхватывает ?code= (PKCE)
 // или #access_token= (implicit) из URL при переходе по ссылке из письма.
