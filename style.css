@@ -157,6 +157,15 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   margin-bottom: 14px;
   gap: 10px;
 }
+/* invisible flex-break element — active only on mobile via media query */
+.header-break { display: none; }
+/* pill + avatar grouped, pushed to the right on all screen sizes */
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+}
 
 /* ===== BRAND TITLE ===== */
 .brand-title {
@@ -621,6 +630,11 @@ label .lucide { width: 16px; height: 16px; }
   body { margin: 12px; }
   button { min-height: 44px; }
   .user-avatar-btn { width: 44px; height: 44px; }
+  /* 2-row header layout on narrow screens */
+  .app-header { row-gap: 5px; }
+  .app-header .brand-title { flex: 1; }
+  /* activate the flex-break between group 1 (brand+theme) and group 2 (pill+avatar) */
+  .header-break { display: block; flex: 0 0 100%; height: 0; }
   .btn-icon { min-width: 44px; }
   .password-toggle { min-height: 44px; min-width: 44px; }
   .pill { font-size: 0.8em; }
