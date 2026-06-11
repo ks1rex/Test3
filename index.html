@@ -200,6 +200,31 @@
   </div>
 </div>
 
+<!-- ===== SUBMIT TEST SCREEN ===== -->
+<div id="submitTestScreen" class="screen-center" style="display:none">
+  <div class="auth-card panel">
+    <h2 class="auth-title brand-title">Мед<span class="brand-accent">Тест</span></h2>
+    <p class="auth-subtitle">Предложить тест</p>
+    <p class="auth-hint">Пришлите файл с вопросами в любом формате — мы добавим их в тренажёр после проверки</p>
+    <div>
+      <label class="auth-label">Файл
+        <input id="submitFileInput" class="auth-input submit-file-input" type="file">
+      </label>
+      <p class="auth-hint" style="margin-top:4px">до 25 МБ</p>
+      <div id="submitFileError" class="auth-msg auth-msg--error" role="alert" style="display:none"></div>
+    </div>
+    <label class="auth-label">Тема (необязательно)
+      <input id="submitTopicInput" class="auth-input" type="text" placeholder="Например: Фармакология" maxlength="200">
+    </label>
+    <label class="auth-label">Комментарий (необязательно)
+      <textarea id="submitCommentInput" class="auth-input submit-comment" placeholder="Дополнительная информация о тесте…" maxlength="1000"></textarea>
+    </label>
+    <div id="submitSuccess" class="auth-msg auth-msg--success" role="status" style="display:none"></div>
+    <button id="submitTestBtn" class="auth-btn" type="button">Отправить</button>
+    <button id="backFromSubmitBtn" class="btn-link" type="button">← Назад к тренажёру</button>
+  </div>
+</div>
+
 <!-- ===== USER MENU DROPDOWN ===== -->
 <div id="userMenuDropdown" class="user-menu-dropdown" style="display:none" role="menu" aria-label="Меню пользователя">
   <button id="menuGoProfile" class="user-menu-item" role="menuitem"><i data-lucide="user"></i> Мой профиль</button>

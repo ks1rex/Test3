@@ -563,6 +563,49 @@ label .lucide { width: 16px; height: 16px; }
   border-color: #a93226;
 }
 
+/* ===== SUBMIT TEST SCREEN ===== */
+.submit-file-input {
+  padding: 8px 10px;
+  cursor: pointer;
+  font-size: 0.88em;
+}
+.submit-file-input::file-selector-button {
+  background: var(--accent-btn);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-input);
+  padding: 6px 12px;
+  margin-right: 10px;
+  cursor: pointer;
+  font-size: 0.88em;
+  transition: background 0.15s;
+}
+.submit-file-input::file-selector-button:hover { background: var(--accent-btn-hover); }
+
+.submit-comment {
+  min-height: 80px;
+  resize: vertical;
+  font-family: inherit;
+  font-size: 16px;
+  width: 100%;
+  background: var(--bg-color);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-input);
+  padding: 10px 12px;
+  transition: border-color 0.15s;
+  box-sizing: border-box;
+}
+.submit-comment:focus { outline: none; border-color: var(--accent); }
+.submit-comment:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.submit-comment::placeholder { color: var(--muted); }
+
+.auth-msg--success {
+  color: var(--success);
+  background: var(--success-bg);
+  border: 1px solid var(--success-border);
+}
+
 /* ===== REDUCED MOTION ===== */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

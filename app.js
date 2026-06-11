@@ -587,9 +587,10 @@ const authScreen = document.getElementById("authScreen");
 const activationScreen = document.getElementById("activationScreen");
 const appScreen = document.getElementById("appScreen");
 const profileScreen = document.getElementById("profileScreen");
+const submitTestScreen = document.getElementById("submitTestScreen");
 
 function showScreen(screen) {
-  [loadingScreen, authScreen, activationScreen, appScreen, resetPasswordScreen, profileScreen].forEach(s => { s.style.display = "none"; });
+  [loadingScreen, authScreen, activationScreen, appScreen, resetPasswordScreen, profileScreen, submitTestScreen].forEach(s => { s.style.display = "none"; });
   screen.style.display = "";
 }
 
@@ -640,6 +641,7 @@ const backToAppBtn = document.getElementById("backToAppBtn");
 
 /* ========== CURRENT USER STATE ========== */
 let currentEmail = '';
+let currentUserId = null;
 let currentExpiresAt = null;
 let currentUnlimited = false;
 
@@ -838,10 +840,11 @@ activateBtn.onclick = async () => {
 
   if (!ok) { showActivationError("Код недействителен или уже использован."); return; }
 
-  const { expiresAt, unlimited, email } = await checkAccess();
+  const { expiresAt, unlimited, email, userId } = await checkAccess();
   currentExpiresAt = expiresAt;
   currentUnlimited = unlimited;
   currentEmail = email ?? '';
+  currentUserId = userId ?? null;
   updateAccessPill(expiresAt, unlimited);
   showScreen(appScreen);
   loadTopicList();
@@ -873,6 +876,7 @@ function resetAppState() {
   accessPill.style.display = "none";
   accessPill.textContent = "";
   currentEmail = '';
+  currentUserId = null;
   currentExpiresAt = null;
   currentUnlimited = false;
 
@@ -933,7 +937,7 @@ document.addEventListener('click', (e) => {
 });
 
 menuGoProfile.onclick = () => { closeUserMenu(); showProfileScreen(); };
-menuGoSubmit.onclick = () => { closeUserMenu(); }; // подключается в следующем коммите
+menuGoSubmit.onclick = () => { closeUserMenu(); showSubmitTestScreen(); };
 menuSignOut.onclick = async () => {
   closeUserMenu();
   menuSignOut.disabled = true;
@@ -944,6 +948,85 @@ menuSignOut.onclick = async () => {
 };
 
 backToAppBtn.onclick = () => showScreen(appScreen);
+
+/* ========== SUBMIT TEST SCREEN ========== */
+const submitFileInput = document.getElementById("submitFileInput");
+const submitFileError = document.getElementById("submitFileError");
+const submitTopicInput = document.getElementById("submitTopicInput");
+const submitCommentInput = document.getElementById("submitCommentInput");
+const submitSuccess = document.getElementById("submitSuccess");
+const submitTestBtn = document.getElementById("submitTestBtn");
+const backFromSubmitBtn = document.getElementById("backFromSubmitBtn");
+
+function showSubmitTestScreen() {
+  submitFileInput.value = "";
+  submitTopicInput.value = "";
+  submitCommentInput.value = "";
+  submitFileError.style.display = "none";
+  submitSuccess.style.display = "none";
+  submitTestBtn.disabled = false;
+  submitTestBtn.textContent = "Отправить";
+  showScreen(submitTestScreen);
+}
+
+backFromSubmitBtn.onclick = () => showScreen(appScreen);
+
+submitTestBtn.onclick = async () => {
+  submitFileError.style.display = "none";
+  submitSuccess.style.display = "none";
+
+  const file = submitFileInput.files[0];
+  if (!file) {
+    submitFileError.textContent = "Выберите файл.";
+    submitFileError.style.display = "block";
+    return;
+  }
+  if (file.size > 25 * 1024 * 1024) {
+    submitFileError.textContent = "Файл слишком большой. Максимальный размер — 25 МБ.";
+    submitFileError.style.display = "block";
+    return;
+  }
+
+  submitTestBtn.disabled = true;
+  submitTestBtn.textContent = "Загрузка…";
+
+  const filePath = `${currentUserId}/${Date.now()}_${file.name}`;
+  const { error: uploadError } = await supabaseClient.storage
+    .from('submissions')
+    .upload(filePath, file);
+
+  if (uploadError) {
+    submitFileError.textContent = "Ошибка загрузки файла: " + uploadError.message;
+    submitFileError.style.display = "block";
+    submitTestBtn.disabled = false;
+    submitTestBtn.textContent = "Отправить";
+    return;
+  }
+
+  const { error: insertError } = await supabaseClient.from('question_submissions').insert({
+    user_id: currentUserId,
+    user_email: currentEmail,
+    file_path: filePath,
+    original_filename: file.name,
+    topic_hint: submitTopicInput.value.trim() || null,
+    comment: submitCommentInput.value.trim() || null,
+  });
+
+  submitTestBtn.disabled = false;
+  submitTestBtn.textContent = "Отправить";
+
+  if (insertError) {
+    submitFileError.textContent = "Ошибка отправки: " + insertError.message;
+    submitFileError.style.display = "block";
+    return;
+  }
+
+  submitSuccess.textContent = "Спасибо! Ваш файл успешно отправлен.";
+  submitSuccess.style.display = "block";
+  submitFileInput.value = "";
+  submitTopicInput.value = "";
+  submitCommentInput.value = "";
+};
 
 profileRedeemBtn.onclick = async () => {
   const code = profileCodeInput.value.trim();
@@ -1149,7 +1232,7 @@ async function initAccess() {
     return;
   }
   if (recoveryMode) return;
-  const { loggedIn, hasAccess, expiresAt, unlimited, email } = result;
+  const { loggedIn, hasAccess, expiresAt, unlimited, email, userId } = result;
   if (!loggedIn) {
     showScreen(authScreen);
   } else if (!hasAccess) {
@@ -1161,6 +1244,7 @@ async function initAccess() {
     currentExpiresAt = expiresAt;
     currentUnlimited = unlimited;
     currentEmail = email ?? '';
+    currentUserId = userId ?? null;
     updateAccessPill(expiresAt, unlimited);
     showScreen(appScreen);
     loadTopicList();

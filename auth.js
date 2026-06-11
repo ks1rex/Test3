@@ -40,7 +40,7 @@ async function getSession() {
 
 async function checkAccess() {
   const session = await getSession();
-  if (!session) return { loggedIn: false, hasAccess: false, expiresAt: null, unlimited: false, email: null };
+  if (!session) return { loggedIn: false, hasAccess: false, expiresAt: null, unlimited: false, email: null, userId: null };
 
   const { data, error } = await supabaseClient
     .from('profiles')
@@ -48,12 +48,12 @@ async function checkAccess() {
     .eq('id', session.user.id)
     .single();
 
-  if (error || !data) return { loggedIn: true, hasAccess: false, expiresAt: null, unlimited: false, email: session.user.email };
+  if (error || !data) return { loggedIn: true, hasAccess: false, expiresAt: null, unlimited: false, email: session.user.email, userId: session.user.id };
 
   const expiresAt = data.access_expires_at ?? null;
   const unlimited = data.unlimited_access === true;
   const hasAccess = unlimited || (expiresAt !== null && new Date(expiresAt) > new Date());
-  return { loggedIn: true, hasAccess, expiresAt, unlimited, email: session.user.email };
+  return { loggedIn: true, hasAccess, expiresAt, unlimited, email: session.user.email, userId: session.user.id };
 }
 
 async function redeemCode(code) {
