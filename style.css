@@ -157,8 +157,6 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   margin-bottom: 14px;
   gap: 10px;
 }
-/* invisible flex-break element — active only on mobile via media query */
-.header-break { display: none; }
 /* pill + avatar grouped, pushed to the right on all screen sizes */
 .header-right {
   display: flex;
@@ -636,13 +634,15 @@ label .lucide { width: 16px; height: 16px; }
   button { min-height: 44px; }
   .user-avatar-btn { width: 44px; height: 44px; }
   /* single-row header on narrow screens */
-  .app-header { gap: 8px; flex-wrap: nowrap; }
-  .app-header .brand-title { font-size: 1.25rem; letter-spacing: 0.02em; white-space: nowrap; }
-  .header-right { gap: 8px; flex-shrink: 0; }
-  /* compact icon-only access pill */
-  .access-pill { width: 32px; height: 32px; padding: 0; border-radius: 50%; justify-content: center; flex-shrink: 0; gap: 0; }
+  .app-header { flex-wrap: nowrap; justify-content: space-between; gap: 8px; }
+  .app-header .brand-title { font-size: 1.1rem; letter-spacing: 0; white-space: nowrap; }
+  .header-right { gap: 6px; flex-shrink: 0; }
+  /* compact icon-only access pill — same size as header icon buttons */
+  .access-pill { width: 36px; height: 36px; padding: 0; border-radius: 50%; justify-content: center; flex-shrink: 0; gap: 0; }
   .access-pill .pill-text { display: none; }
-  .btn-icon { min-width: 44px; }
+  /* header icon buttons: uniform compact size, override mobile button min-height */
+  .app-header .btn-icon,
+  .app-header .user-avatar-btn { width: 36px; height: 36px; min-height: 36px; min-width: 36px; padding: 0; }
   .password-toggle { min-height: 44px; min-width: 44px; }
   .pill { font-size: 0.8em; }
   .row { gap: 6px; }
