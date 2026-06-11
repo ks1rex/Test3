@@ -603,7 +603,6 @@ const authError = document.getElementById("authError");
 const codeInput = document.getElementById("codeInput");
 const activateBtn = document.getElementById("activateBtn");
 const activationError = document.getElementById("activationError");
-const signOutBtn = document.getElementById("signOutBtn");
 const signOutFromActivation = document.getElementById("signOutFromActivation");
 const accessPill = document.getElementById("accessPill");
 const activationHint = document.getElementById("activationHint");
@@ -614,8 +613,15 @@ const backToSignIn = document.getElementById("backToSignIn");
 const passwordHint = document.getElementById("passwordHint");
 const passwordToggle = document.getElementById("passwordToggle");
 
+/* ========== USER MENU REFS ========== */
+const userMenuBtn = document.getElementById("userMenuBtn");
+const profileUserMenuBtn = document.getElementById("profileUserMenuBtn");
+const userMenuDropdown = document.getElementById("userMenuDropdown");
+const menuGoProfile = document.getElementById("menuGoProfile");
+const menuGoSubmit = document.getElementById("menuGoSubmit");
+const menuSignOut = document.getElementById("menuSignOut");
+
 /* ========== PROFILE SCREEN REFS ========== */
-const profileBtn = document.getElementById("profileBtn");
 const profileEmailElem = document.getElementById("profileEmail");
 const profileAccessInfo = document.getElementById("profileAccessInfo");
 const profileCodeSection = document.getElementById("profileCodeSection");
@@ -874,14 +880,6 @@ function resetAppState() {
   showStep();
 }
 
-signOutBtn.onclick = async () => {
-  signOutBtn.disabled = true;
-  await signOut();
-  resetAppState();
-  signOutBtn.disabled = false;
-  showScreen(authScreen);
-};
-
 signOutFromActivation.onclick = async () => {
   signOutFromActivation.disabled = true;
   await signOut();
@@ -889,7 +887,61 @@ signOutFromActivation.onclick = async () => {
   showScreen(authScreen);
 };
 
-profileBtn.onclick = () => showProfileScreen();
+/* ========== USER MENU ========== */
+function openUserMenu(btn) {
+  const rect = btn.getBoundingClientRect();
+  userMenuDropdown.style.top = (rect.bottom + 6) + 'px';
+  userMenuDropdown.style.right = (window.innerWidth - rect.right) + 'px';
+  userMenuDropdown.style.left = 'auto';
+  userMenuDropdown.style.display = '';
+  btn.setAttribute('aria-expanded', 'true');
+}
+
+function closeUserMenu() {
+  userMenuDropdown.style.display = 'none';
+  userMenuBtn.setAttribute('aria-expanded', 'false');
+  profileUserMenuBtn.setAttribute('aria-expanded', 'false');
+}
+
+function toggleUserMenu(btn) {
+  if (userMenuDropdown.style.display === 'none' || userMenuDropdown.style.display === '') {
+    // Check actual computed visibility
+    if (userMenuDropdown.offsetParent === null && userMenuDropdown.style.display === '') {
+      openUserMenu(btn);
+    } else if (userMenuDropdown.style.display === 'none') {
+      openUserMenu(btn);
+    } else {
+      closeUserMenu();
+    }
+  } else {
+    closeUserMenu();
+  }
+}
+
+userMenuBtn.onclick = (e) => {
+  e.stopPropagation();
+  userMenuDropdown.style.display !== 'none' ? closeUserMenu() : openUserMenu(userMenuBtn);
+};
+profileUserMenuBtn.onclick = (e) => {
+  e.stopPropagation();
+  userMenuDropdown.style.display !== 'none' ? closeUserMenu() : openUserMenu(profileUserMenuBtn);
+};
+document.addEventListener('click', (e) => {
+  if (userMenuDropdown.style.display !== 'none' && !userMenuDropdown.contains(e.target)) {
+    closeUserMenu();
+  }
+});
+
+menuGoProfile.onclick = () => { closeUserMenu(); showProfileScreen(); };
+menuGoSubmit.onclick = () => { closeUserMenu(); }; // подключается в следующем коммите
+menuSignOut.onclick = async () => {
+  closeUserMenu();
+  menuSignOut.disabled = true;
+  await signOut();
+  resetAppState();
+  menuSignOut.disabled = false;
+  showScreen(authScreen);
+};
 
 backToAppBtn.onclick = () => showScreen(appScreen);
 
