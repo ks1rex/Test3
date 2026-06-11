@@ -99,7 +99,7 @@
   <h2 class="brand-title">Мед<span class="brand-accent">Тест</span></h2>
   <div class="header-right">
     <span id="accessPill" class="pill access-pill" style="display:none"></span>
-    <button id="themeToggle" class="btn-icon" aria-label="Переключить тему"><i data-lucide="moon"></i></button>
+    <button id="themeToggle" class="btn-icon" aria-label="Переключить тему" title="Переключить тему"><i data-lucide="moon"></i></button>
     <div class="user-menu-wrap">
       <button id="userMenuBtn" class="user-avatar-btn" aria-label="Меню пользователя" aria-haspopup="true" aria-expanded="false"><i data-lucide="user"></i></button>
       <div class="user-menu-dropdown" style="display:none" role="menu" aria-label="Меню пользователя">
@@ -124,8 +124,8 @@
 
 <div class="panel controls-panel">
   <div class="row controls-setup">
-    <label>С: <input id="rangeStart" type="number" min="1" value="1"></label>
-    <label>По: <input id="rangeEnd" type="number" min="1" value="1"></label>
+    <label>С вопроса: <input id="rangeStart" type="number" min="1" value="1"></label>
+    <label>по вопрос: <input id="rangeEnd" type="number" min="1" value="1"></label>
     <label><input id="shuffle" type="checkbox"> <i data-lucide="shuffle"></i> Перемешать</label>
     <label><input id="hideVariants" type="checkbox"> Скрыть количество вариантов</label>
     <button id="startBtn" class="btn-primary">Начать</button>
@@ -134,38 +134,59 @@
   <div class="row controls-status">
     <span class="pill">Шаг: <span id="stepInfo" aria-live="polite">—/—</span></span>
     <span class="pill">Ошибок: <span id="wrongCount" aria-live="polite">0</span></span>
-    <button id="wrongOnlyBtn" disabled>Ошибочные → новый прогон</button>
+    <button id="wrongOnlyBtn" disabled><i data-lucide="rotate-ccw"></i> Повторить ошибки</button>
   </div>
 </div>
 
 <div class="spacer"></div>
 
 <div class="panel">
-  <div id="question" aria-live="polite">Выберите тему</div>
-  <div id="firstRunHint" class="first-run-hint" style="display:none">
-    <span>1.&nbsp;Выберите тему</span>
-    <span class="first-run-sep">→</span>
-    <span>2.&nbsp;Настройте диапазон (С&nbsp;/&nbsp;По)</span>
-    <span class="first-run-sep">→</span>
-    <span>3.&nbsp;Нажмите <strong>«Начать»</strong></span>
+  <div id="drillContent">
+    <div id="question" aria-live="polite">Выберите тему</div>
+    <div id="firstRunHint" class="first-run-hint" style="display:none">
+      <span>1.&nbsp;Выберите тему</span>
+      <span class="first-run-sep">→</span>
+      <span>2.&nbsp;Настройте диапазон (С&nbsp;/&nbsp;По)</span>
+      <span class="first-run-sep">→</span>
+      <span>3.&nbsp;Нажмите <strong>«Начать»</strong></span>
+    </div>
+    <textarea id="answerInput" placeholder="Ваш ответ..." aria-label="Ваш ответ"></textarea>
+    <div id="answerContainer"></div>
+
+    <div class="row">
+      <button id="checkBtn" class="btn-primary" disabled>Показать ответ</button>
+      <button id="markRightBtn" disabled>Верно</button>
+      <button id="markWrongBtn" disabled>Неверно</button>
+    </div>
+
+    <div id="kbHint" class="kb-hint" style="display:none">
+      <span><kbd>Пробел</kbd>/<kbd>Enter</kbd> — показать&nbsp;·&nbsp;<kbd>1</kbd>/<kbd>←</kbd> — верно&nbsp;·&nbsp;<kbd>2</kbd>/<kbd>→</kbd> — неверно</span>
+      <button type="button" id="kbHintDismiss" class="kb-hint-dismiss" aria-label="Закрыть подсказку">×</button>
+    </div>
+
+    <div class="spacer"></div>
+    <div id="resultBox"></div>
+    <div id="correctBox"></div>
+
+    <div class="spacer"></div>
+    <div class="row">
+      <button id="prevBtn" class="btn-outline" disabled><i data-lucide="chevron-left"></i> Назад</button>
+      <button id="nextBtn" class="btn-outline" disabled>Вперёд <i data-lucide="chevron-right"></i></button>
+    </div>
   </div>
-  <textarea id="answerInput" placeholder="Ваш ответ..." aria-label="Ваш ответ"></textarea>
-  <div id="answerContainer"></div>
 
-  <div class="row">
-    <button id="checkBtn" class="btn-primary" disabled>Показать ответ</button>
-    <button id="markRightBtn" disabled>Верно</button>
-    <button id="markWrongBtn" disabled>Неверно</button>
-  </div>
-
-  <div class="spacer"></div>
-  <div id="resultBox"></div>
-  <div id="correctBox"></div>
-
-  <div class="spacer"></div>
-  <div class="row">
-    <button id="prevBtn" class="btn-outline" disabled><i data-lucide="chevron-left"></i> Назад</button>
-    <button id="nextBtn" class="btn-outline" disabled>Вперёд <i data-lucide="chevron-right"></i></button>
+  <div id="sessionComplete" style="display:none">
+    <div class="session-complete-icon"><i data-lucide="check-circle-2"></i></div>
+    <p class="session-complete-title">Сессия завершена</p>
+    <div class="session-complete-stats row">
+      <div class="session-stat"><strong id="sessionCorrect">0</strong><span>правильно</span></div>
+      <div class="session-stat session-stat--error"><strong id="sessionErrors">0</strong><span>ошибок</span></div>
+      <div class="session-stat"><strong id="sessionPct">0%</strong><span>результат</span></div>
+    </div>
+    <div class="row session-complete-actions">
+      <button id="restartSessionBtn" class="btn-primary"><i data-lucide="rotate-ccw"></i> Начать заново</button>
+      <button id="repeatWrongSessionBtn" class="btn-outline" style="display:none"><i data-lucide="alert-circle"></i> Повторить ошибки</button>
+    </div>
   </div>
 </div>
 

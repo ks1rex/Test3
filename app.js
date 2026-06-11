@@ -40,6 +40,15 @@ const hideVariantsElem = document.getElementById("hideVariants");
 const resultBox = document.getElementById("resultBox");
 const firstRunHint = document.getElementById("firstRunHint");
 const rangeError = document.getElementById("rangeError");
+const drillContent = document.getElementById("drillContent");
+const sessionComplete = document.getElementById("sessionComplete");
+const sessionCorrectEl = document.getElementById("sessionCorrect");
+const sessionErrorsEl = document.getElementById("sessionErrors");
+const sessionPctEl = document.getElementById("sessionPct");
+const restartSessionBtn = document.getElementById("restartSessionBtn");
+const repeatWrongSessionBtn = document.getElementById("repeatWrongSessionBtn");
+const kbHint = document.getElementById("kbHint");
+const kbHintDismiss = document.getElementById("kbHintDismiss");
 
 /* ========== DOM REFS — reset password ========== */
 const resetPasswordScreen = document.getElementById("resetPasswordScreen");
@@ -61,6 +70,8 @@ let QA = [];
 let order = [];
 let idx = 0;
 let wrongSet = new Set();
+let lastStart = 0;
+let lastEnd = 0;
 
 hideVariantsElem.onchange = () => {
   showQA();
@@ -105,6 +116,8 @@ async function loadTopic(filename){
   wrongSet.clear();
   idx = 0;
   order = [];
+  hideSessionComplete();
+  kbHint.style.display = 'none';
 
   if(!filename){
     QA = [];
@@ -166,6 +179,62 @@ function showStep(){
   wrongCount.textContent = wrongSet.size;
 }
 
+/* ========== SESSION COMPLETE ========== */
+function showSessionComplete() {
+  hideAnswer();
+  const total = order.length;
+  const errors = wrongSet.size;
+  const correct = total - errors;
+  const pct = total > 0 ? Math.round(correct / total * 100) : 0;
+  sessionCorrectEl.textContent = correct;
+  sessionErrorsEl.textContent = errors;
+  sessionPctEl.textContent = pct + '%';
+  repeatWrongSessionBtn.style.display = errors > 0 ? '' : 'none';
+  kbHint.style.display = 'none';
+  drillContent.style.display = 'none';
+  sessionComplete.style.display = '';
+  showStep();
+  lucide.createIcons();
+}
+
+function hideSessionComplete() {
+  sessionComplete.style.display = 'none';
+  drillContent.style.display = '';
+}
+
+/* ========== KEYBOARD HINT ========== */
+function maybeShowKbHint() {
+  if (!localStorage.getItem('kbHintSeen')) {
+    kbHint.style.display = '';
+  }
+}
+function dismissKbHint() {
+  if (kbHint.style.display !== 'none') {
+    kbHint.style.display = 'none';
+    localStorage.setItem('kbHintSeen', '1');
+  }
+}
+kbHintDismiss.onclick = () => {
+  kbHint.style.display = 'none';
+  localStorage.setItem('kbHintSeen', '1');
+};
+
+/* ========== PILL TOAST ========== */
+function showPillToast(msg, duration) {
+  if (duration === undefined) duration = 4000;
+  let toast = document.getElementById('pillToast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'pillToast';
+    toast.className = 'pill-toast';
+    document.body.appendChild(toast);
+  }
+  toast.textContent = msg;
+  toast.classList.add('pill-toast--visible');
+  clearTimeout(toast._timer);
+  toast._timer = setTimeout(() => toast.classList.remove('pill-toast--visible'), duration);
+}
+
 function normalizeQuestion(text) {
   if (!hideVariantsElem.checked) return text;
 
@@ -201,6 +270,7 @@ function fisherYates(arr) {
 }
 /* ========== SHOW QA ========== */
 function showQA(){
+  hideSessionComplete();
   if(!order.length){
     firstRunHint.style.display = "";
     questionBox.textContent = "Нажмите «Начать»";
@@ -552,12 +622,15 @@ startBtn.onclick = () => {
   const start = Math.max(1, parseInt(rangeStartElem.value || 1)) - 1;
   let end = Math.min(QA.length, parseInt(rangeEndElem.value || QA.length));
   if (isNaN(start) || isNaN(end) || start < 0 || end <= start) {
-    rangeError.textContent = "Неверный диапазон: «С» должно быть меньше «По» и не выходить за пределы списка.";
+    rangeError.textContent = "Неверный диапазон. Начало должно быть меньше конца и не выходить за пределы списка.";
     rangeError.style.display = "";
     return;
   }
+  lastStart = start;
+  lastEnd = end;
   buildOrder(start, end);
   showQA();
+  maybeShowKbHint();
 };
 
 wrongOnlyBtn.onclick = () => {
@@ -566,16 +639,32 @@ wrongOnlyBtn.onclick = () => {
   if (shuffleElem.checked) fisherYates(order);
   idx = 0;
   showQA();
+  maybeShowKbHint();
+};
+
+restartSessionBtn.onclick = () => {
+  buildOrder(lastStart, lastEnd);
+  showQA();
+  maybeShowKbHint();
+};
+
+repeatWrongSessionBtn.onclick = () => {
+  if (!wrongSet.size) return;
+  order = Array.from(wrongSet);
+  if (shuffleElem.checked) fisherYates(order);
+  idx = 0;
+  showQA();
+  maybeShowKbHint();
 };
 
 
 markRightBtn.onclick = () => {
   wrongSet.delete(order[idx]);
-  if (idx < order.length - 1) { idx++; showQA(); } else { showStep(); updateButtons(); }
+  if (idx < order.length - 1) { idx++; showQA(); } else { showSessionComplete(); }
 };
 markWrongBtn.onclick = () => {
   wrongSet.add(order[idx]);
-  if (idx < order.length - 1) { idx++; showQA(); } else { showStep(); updateButtons(); }
+  if (idx < order.length - 1) { idx++; showQA(); } else { showSessionComplete(); }
 };
 
 nextBtn.onclick = () => { if (idx < order.length - 1) { idx++; showQA(); } };
@@ -684,6 +773,10 @@ function updateAccessPill(expiresAt, unlimited) {
     accessPill.title = "Бессрочный доступ";
     accessPill.style.display = "";
     lucide.createIcons();
+    if (!localStorage.getItem('pillToastSeen')) {
+      localStorage.setItem('pillToastSeen', '1');
+      showPillToast('Ваш доступ: бессрочный');
+    }
     return;
   }
   if (!expiresAt) { accessPill.style.display = "none"; return; }
@@ -692,6 +785,10 @@ function updateAccessPill(expiresAt, unlimited) {
   accessPill.title = `Доступ до ${dateStr}`;
   accessPill.style.display = "";
   lucide.createIcons();
+  if (!localStorage.getItem('pillToastSeen')) {
+    localStorage.setItem('pillToastSeen', '1');
+    showPillToast(`Доступ до ${dateStr}`);
+  }
 }
 
 function showAdminMsg(el, text, type) {
@@ -868,6 +965,8 @@ function resetAppState() {
   order = [];
   idx = 0;
   wrongSet.clear();
+  hideSessionComplete();
+  kbHint.style.display = 'none';
 
   topicSelect.innerHTML = "";
   topicSelect.onchange = null;
@@ -1287,26 +1386,52 @@ supabaseClient.auth.onAuthStateChange((event, session) => {
   }
 });
 initAccess();
-/* ========== KEYBOARD SHORTCUTS (fixed toggle) ========== */
+/* ========== KEYBOARD SHORTCUTS ========== */
+// Space / Enter — show/hide answer
+// 1 / ← (when answer visible) — mark right
+// 2 / → (when answer visible) — mark wrong
+// ← / → (when answer hidden) — navigate prev/next
 document.addEventListener("keydown", (e) => {
-  if (document.activeElement === answerInput) {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      toggleAnswer();
-    }
+  const inTextarea = document.activeElement === answerInput;
+  if (!inTextarea) {
+    const tag = document.activeElement.tagName;
+    if (tag === "INPUT" || tag === "SELECT" || tag === "TEXTAREA" || tag === "BUTTON") return;
+  }
+  if (appScreen.style.display === "none") return;
+
+  const answerShowing = isAnswerVisible();
+
+  const isToggleKey =
+    (e.key === "Enter" && !(inTextarea && e.shiftKey)) ||
+    (e.key === " " && !inTextarea);
+
+  if (isToggleKey && !checkBtn.disabled) {
+    e.preventDefault();
+    if (answerShowing) { hideAnswer(); }
+    else { checkBtn.click(); dismissKbHint(); }
     return;
   }
-  // Don't intercept arrow/enter when fill_each/sequence inputs or matching selects have focus
-  const tag = document.activeElement.tagName;
-  if (tag === "INPUT" || tag === "SELECT") return;
 
-  if (e.key === "Enter") {
-    e.preventDefault();
-    toggleAnswer();
-  } else if (e.key === "ArrowLeft") {
-    if (!prevBtn.disabled) prevBtn.click();
-  } else if (e.key === "ArrowRight") {
-    if (!nextBtn.disabled) nextBtn.click();
+  if (inTextarea) return;
+
+  if (answerShowing) {
+    if ((e.key === "1" || e.key === "ArrowLeft") && !markRightBtn.disabled) {
+      e.preventDefault();
+      markRightBtn.click();
+      dismissKbHint();
+    } else if ((e.key === "2" || e.key === "ArrowRight") && !markWrongBtn.disabled) {
+      e.preventDefault();
+      markWrongBtn.click();
+      dismissKbHint();
+    }
+  } else {
+    if (e.key === "ArrowLeft" && !prevBtn.disabled) {
+      e.preventDefault();
+      prevBtn.click();
+    } else if (e.key === "ArrowRight" && !nextBtn.disabled) {
+      e.preventDefault();
+      nextBtn.click();
+    }
   }
 });
 
