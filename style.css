@@ -351,7 +351,7 @@ select:focus-visible, input[type=number]:focus-visible { outline: 2px solid var(
 .auth-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
 /* messages */
-#authForm, #confirmNotice { display: flex; flex-direction: column; gap: 12px; }
+#authForm, #confirmNotice, #forgotPasswordForm { display: flex; flex-direction: column; gap: 12px; }
 .auth-msg { padding: 9px 12px; border-radius: var(--radius-input); font-size: 0.88em; line-height: 1.5; }
 .auth-msg--error { color: var(--error); background: var(--error-bg); border: 1px solid var(--error-border); }
 .auth-msg--info { color: var(--accent); background: var(--panel-color); border: 1px solid var(--accent); text-align: center; }
@@ -436,6 +436,77 @@ label .lucide { width: 16px; height: 16px; }
 
 /* ===== ANSWER CONTAINER ROWS ===== */
 #answerContainer > div { overflow-wrap: break-word; }
+
+/* ===== PROFILE SCREEN ===== */
+.profile-card { max-width: 440px; }
+
+.profile-user-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  background: var(--bg-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-input);
+  color: var(--muted);
+  font-size: 0.92em;
+}
+.profile-email-text { overflow-wrap: anywhere; }
+
+.profile-access {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 14px;
+  border-radius: var(--radius-input);
+  font-weight: 600;
+  font-size: 0.95em;
+  border: 1px solid transparent;
+}
+.profile-access--unlimited {
+  color: var(--accent);
+  background: rgba(20, 168, 154, 0.12);
+  border-color: var(--accent);
+}
+.profile-access--active {
+  color: var(--success);
+  background: var(--success-bg);
+  border-color: var(--success-border);
+}
+.profile-access--none {
+  color: var(--muted);
+  background: var(--bg-color);
+  border-color: var(--border-color);
+}
+
+.profile-divider {
+  height: 1px;
+  background: var(--border-color);
+  margin: 2px 0;
+}
+.profile-section-title {
+  margin: 0;
+  font-size: 0.95em;
+  font-weight: 700;
+  color: var(--text-color);
+}
+.profile-section-sub {
+  margin: 0;
+  font-size: 0.85em;
+  font-weight: 600;
+  color: var(--muted);
+}
+.profile-section-sub--gap { margin-top: 10px; }
+
+.btn-danger {
+  background: var(--error);
+  color: #fff;
+  border-color: var(--error);
+}
+.btn-danger:hover:not(:disabled) {
+  background: #a93226;
+  border-color: #a93226;
+}
 
 /* ===== REDUCED MOTION ===== */
 @media (prefers-reduced-motion: reduce) {

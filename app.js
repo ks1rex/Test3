@@ -586,9 +586,10 @@ const loadingScreen = document.getElementById("loadingScreen");
 const authScreen = document.getElementById("authScreen");
 const activationScreen = document.getElementById("activationScreen");
 const appScreen = document.getElementById("appScreen");
+const profileScreen = document.getElementById("profileScreen");
 
 function showScreen(screen) {
-  [loadingScreen, authScreen, activationScreen, appScreen, resetPasswordScreen].forEach(s => { s.style.display = "none"; });
+  [loadingScreen, authScreen, activationScreen, appScreen, resetPasswordScreen, profileScreen].forEach(s => { s.style.display = "none"; });
   screen.style.display = "";
 }
 
@@ -612,6 +613,29 @@ const confirmText = document.getElementById("confirmText");
 const backToSignIn = document.getElementById("backToSignIn");
 const passwordHint = document.getElementById("passwordHint");
 const passwordToggle = document.getElementById("passwordToggle");
+
+/* ========== PROFILE SCREEN REFS ========== */
+const profileBtn = document.getElementById("profileBtn");
+const profileEmailElem = document.getElementById("profileEmail");
+const profileAccessInfo = document.getElementById("profileAccessInfo");
+const profileCodeSection = document.getElementById("profileCodeSection");
+const profileCodeInput = document.getElementById("profileCodeInput");
+const profileCodeError = document.getElementById("profileCodeError");
+const profileCodeSuccess = document.getElementById("profileCodeSuccess");
+const profileRedeemBtn = document.getElementById("profileRedeemBtn");
+const adminBlock = document.getElementById("adminBlock");
+const grantEmailInput = document.getElementById("grantEmailInput");
+const grantMsg = document.getElementById("grantMsg");
+const grantAccessBtn = document.getElementById("grantAccessBtn");
+const revokeEmailInput = document.getElementById("revokeEmailInput");
+const revokeMsg = document.getElementById("revokeMsg");
+const revokeAccessBtn = document.getElementById("revokeAccessBtn");
+const backToAppBtn = document.getElementById("backToAppBtn");
+
+/* ========== CURRENT USER STATE ========== */
+let currentEmail = '';
+let currentExpiresAt = null;
+let currentUnlimited = false;
 
 // Enter-to-submit on auth and activation forms
 [authEmail, authPassword].forEach(el => {
@@ -649,11 +673,46 @@ function formatDate(isoStr) {
          d.getFullYear();
 }
 
-function updateAccessPill(expiresAt) {
+function updateAccessPill(expiresAt, unlimited) {
+  if (unlimited) {
+    accessPill.innerHTML = `<i data-lucide="infinity"></i> Бессрочный доступ`;
+    accessPill.style.display = "";
+    lucide.createIcons();
+    return;
+  }
   if (!expiresAt) { accessPill.style.display = "none"; return; }
   accessPill.innerHTML = `<i data-lucide="clock"></i> Доступ до ${formatDate(expiresAt)}`;
   accessPill.style.display = "";
   lucide.createIcons();
+}
+
+function showAdminMsg(el, text, type) {
+  el.textContent = text;
+  el.className = `auth-msg auth-msg--${type === 'error' ? 'error' : 'info'}`;
+  el.style.display = "block";
+}
+
+function showProfileScreen() {
+  profileEmailElem.textContent = currentEmail;
+
+  if (currentUnlimited) {
+    profileAccessInfo.innerHTML = `<div class="profile-access profile-access--unlimited"><i data-lucide="infinity"></i> Доступ: бессрочный</div>`;
+    profileCodeSection.style.display = "none";
+  } else if (currentExpiresAt) {
+    profileAccessInfo.innerHTML = `<div class="profile-access profile-access--active"><i data-lucide="clock"></i> Доступ активен до ${formatDate(currentExpiresAt)}</div>`;
+    profileCodeSection.style.display = "";
+  } else {
+    profileAccessInfo.innerHTML = `<div class="profile-access profile-access--none">Нет активного доступа</div>`;
+    profileCodeSection.style.display = "";
+  }
+
+  adminBlock.style.display = currentEmail === ADMIN_EMAIL ? "" : "none";
+
+  profileCodeError.style.display = "none";
+  profileCodeSuccess.style.display = "none";
+
+  lucide.createIcons();
+  showScreen(profileScreen);
 }
 
 // Переводит типичные ошибки Supabase Auth в читаемый русский текст
@@ -773,8 +832,11 @@ activateBtn.onclick = async () => {
 
   if (!ok) { showActivationError("Код недействителен или уже использован."); return; }
 
-  const { expiresAt } = await checkAccess();
-  updateAccessPill(expiresAt);
+  const { expiresAt, unlimited, email } = await checkAccess();
+  currentExpiresAt = expiresAt;
+  currentUnlimited = unlimited;
+  currentEmail = email ?? '';
+  updateAccessPill(expiresAt, unlimited);
   showScreen(appScreen);
   loadTopicList();
 };
@@ -804,6 +866,9 @@ function resetAppState() {
 
   accessPill.style.display = "none";
   accessPill.textContent = "";
+  currentEmail = '';
+  currentExpiresAt = null;
+  currentUnlimited = false;
 
   updateButtons();
   showStep();
@@ -822,6 +887,103 @@ signOutFromActivation.onclick = async () => {
   await signOut();
   signOutFromActivation.disabled = false;
   showScreen(authScreen);
+};
+
+profileBtn.onclick = () => showProfileScreen();
+
+backToAppBtn.onclick = () => showScreen(appScreen);
+
+profileRedeemBtn.onclick = async () => {
+  const code = profileCodeInput.value.trim();
+  if (!code) {
+    profileCodeError.textContent = "Введите код активации.";
+    profileCodeError.style.display = "block";
+    return;
+  }
+  profileRedeemBtn.disabled = true;
+  profileRedeemBtn.textContent = "Проверка…";
+  profileCodeError.style.display = "none";
+  profileCodeSuccess.style.display = "none";
+
+  const ok = await redeemCode(code);
+
+  profileRedeemBtn.disabled = false;
+  profileRedeemBtn.textContent = "Активировать код";
+
+  if (!ok) {
+    profileCodeError.textContent = "Код недействителен или уже использован.";
+    profileCodeError.style.display = "block";
+    return;
+  }
+
+  const { expiresAt, unlimited } = await checkAccess();
+  currentExpiresAt = expiresAt;
+  currentUnlimited = unlimited;
+  updateAccessPill(expiresAt, unlimited);
+  profileCodeSuccess.textContent = `Доступ продлён до ${formatDate(expiresAt)}`;
+  profileCodeSuccess.style.display = "block";
+  profileCodeInput.value = "";
+  if (unlimited) {
+    profileAccessInfo.innerHTML = `<div class="profile-access profile-access--unlimited"><i data-lucide="infinity"></i> Доступ: бессрочный</div>`;
+    profileCodeSection.style.display = "none";
+  } else {
+    profileAccessInfo.innerHTML = `<div class="profile-access profile-access--active"><i data-lucide="clock"></i> Доступ активен до ${formatDate(expiresAt)}</div>`;
+  }
+  lucide.createIcons();
+};
+
+grantAccessBtn.onclick = async () => {
+  const email = grantEmailInput.value.trim();
+  if (!email || !/.+@.+\..+/.test(email)) {
+    showAdminMsg(grantMsg, 'Введите корректный email-адрес.', 'error');
+    return;
+  }
+  grantAccessBtn.disabled = true;
+  grantAccessBtn.textContent = "Выдача…";
+  grantMsg.style.display = "none";
+
+  const { data, error } = await supabaseClient.rpc('admin_grant_unlimited_access', { target_email: email });
+
+  grantAccessBtn.disabled = false;
+  grantAccessBtn.textContent = "Выдать доступ";
+
+  if (error) {
+    showAdminMsg(grantMsg, 'Ошибка: ' + error.message, 'error');
+    return;
+  }
+  if (data === true) {
+    showAdminMsg(grantMsg, `Доступ выдан ${email}`, 'info');
+    grantEmailInput.value = "";
+  } else {
+    showAdminMsg(grantMsg, 'Пользователь с таким email не найден', 'error');
+  }
+};
+
+revokeAccessBtn.onclick = async () => {
+  const email = revokeEmailInput.value.trim();
+  if (!email || !/.+@.+\..+/.test(email)) {
+    showAdminMsg(revokeMsg, 'Введите корректный email-адрес.', 'error');
+    return;
+  }
+  revokeAccessBtn.disabled = true;
+  revokeAccessBtn.textContent = "Отзыв…";
+  revokeMsg.style.display = "none";
+
+  const { data, error } = await supabaseClient.rpc('admin_revoke_unlimited_access', { target_email: email });
+
+  revokeAccessBtn.disabled = false;
+  revokeAccessBtn.textContent = "Отозвать доступ";
+
+  if (error) {
+    showAdminMsg(revokeMsg, 'Ошибка: ' + error.message, 'error');
+    return;
+  }
+  if (data === true) {
+    showAdminMsg(revokeMsg, `Доступ отозван у ${email}`, 'info');
+    revokeEmailInput.value = "";
+  } else {
+    showAdminMsg(revokeMsg, 'Пользователь с таким email не найден', 'error');
+  }
 };
 
 /* ========== FORGOT PASSWORD ========== */
@@ -935,7 +1097,7 @@ async function initAccess() {
     return;
   }
   if (recoveryMode) return;
-  const { loggedIn, hasAccess, expiresAt } = result;
+  const { loggedIn, hasAccess, expiresAt, unlimited, email } = result;
   if (!loggedIn) {
     showScreen(authScreen);
   } else if (!hasAccess) {
@@ -944,7 +1106,10 @@ async function initAccess() {
       : "Введите код активации, чтобы получить доступ к тренажёру.";
     showScreen(activationScreen);
   } else {
-    updateAccessPill(expiresAt);
+    currentExpiresAt = expiresAt;
+    currentUnlimited = unlimited;
+    currentEmail = email ?? '';
+    updateAccessPill(expiresAt, unlimited);
     showScreen(appScreen);
     loadTopicList();
   }

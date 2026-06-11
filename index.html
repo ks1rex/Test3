@@ -34,10 +34,21 @@
       </label>
       <p id="passwordHint" class="auth-hint" style="display:none">Минимум 6 символов</p>
       <button id="authSubmitBtn" class="auth-btn" type="button">Войти</button>
+      <button id="forgotPasswordBtn" class="btn-link" type="button">Забыли пароль?</button>
     </form>
     <div id="confirmNotice" style="display:none">
       <div id="confirmText" class="auth-msg auth-msg--info"></div>
       <button id="backToSignIn" class="auth-btn">Назад ко входу</button>
+    </div>
+    <div id="forgotPasswordForm" style="display:none">
+      <p class="auth-subtitle" style="margin:0">Сброс пароля</p>
+      <div id="forgotError" class="auth-msg auth-msg--error" role="alert" style="display:none"></div>
+      <div id="forgotSuccess" class="auth-msg auth-msg--info" style="display:none"></div>
+      <label class="auth-label">Email
+        <input id="forgotEmail" class="auth-input" type="email" autocomplete="email" placeholder="you@example.com">
+      </label>
+      <button id="sendResetBtn" class="auth-btn" type="button">Отправить ссылку для сброса</button>
+      <button id="backFromForgot" class="btn-link" type="button">← Назад ко входу</button>
     </div>
   </div>
 </div>
@@ -58,6 +69,25 @@
   </div>
 </div>
 
+<!-- ===== RESET PASSWORD SCREEN ===== -->
+<div id="resetPasswordScreen" class="screen-center" style="display:none">
+  <div class="auth-card panel">
+    <div class="activation-icon"><i data-lucide="lock"></i></div>
+    <h2 class="auth-title brand-title">Мед<span class="brand-accent">Тест</span></h2>
+    <p class="auth-subtitle">Новый пароль</p>
+    <div id="resetError" class="auth-msg auth-msg--error" role="alert" style="display:none"></div>
+    <div id="resetSuccess" class="auth-msg auth-msg--info" style="display:none"></div>
+    <label class="auth-label">Новый пароль
+      <div class="auth-input-wrap">
+        <input id="resetPassword" class="auth-input" type="password" autocomplete="new-password" placeholder="••••••••">
+        <button type="button" id="resetPasswordToggle" class="password-toggle" aria-label="Показать пароль"><i data-lucide="eye"></i></button>
+      </div>
+    </label>
+    <p class="auth-hint">Минимум 6 символов</p>
+    <button id="savePasswordBtn" class="auth-btn" type="button">Сохранить новый пароль</button>
+  </div>
+</div>
+
 <!-- ===== APP SCREEN ===== -->
 <div id="appScreen" style="display:none">
 
@@ -66,6 +96,7 @@
   <h2 class="brand-title">Мед<span class="brand-accent">Тест</span></h2>
   <button id="themeToggle" class="btn-icon" aria-label="Переключить тему"><i data-lucide="moon"></i></button>
   <span id="accessPill" class="pill access-pill" style="display:none"></span>
+  <button id="profileBtn" class="btn-icon" aria-label="Профиль"><i data-lucide="user"></i></button>
   <button id="signOutBtn" class="btn-outline"><i data-lucide="log-out"></i> Выйти</button>
 </div>
 </header>
@@ -128,6 +159,44 @@
 
 </main>
 </div><!-- /#appScreen -->
+
+<!-- ===== PROFILE SCREEN ===== -->
+<div id="profileScreen" class="screen-center" style="display:none">
+  <div class="auth-card panel profile-card">
+    <h2 class="auth-title brand-title">Мед<span class="brand-accent">Тест</span></h2>
+    <p class="auth-subtitle">Профиль</p>
+    <div class="profile-user-row">
+      <i data-lucide="user"></i>
+      <span id="profileEmail" class="profile-email-text"></span>
+    </div>
+    <div id="profileAccessInfo"></div>
+    <div id="profileCodeSection">
+      <label class="auth-label">Код продления
+        <input id="profileCodeInput" class="auth-input" type="text" placeholder="XXXX-XXXX" maxlength="9" spellcheck="false" autocapitalize="none" autocorrect="off">
+      </label>
+      <div id="profileCodeError" class="auth-msg auth-msg--error" role="alert" style="display:none"></div>
+      <div id="profileCodeSuccess" class="auth-msg auth-msg--info" style="display:none"></div>
+      <button id="profileRedeemBtn" class="auth-btn" type="button">Активировать код</button>
+    </div>
+    <div id="adminBlock" style="display:none">
+      <div class="profile-divider"></div>
+      <h3 class="profile-section-title">Администрирование</h3>
+      <p class="profile-section-sub">Выдать бессрочный доступ</p>
+      <label class="auth-label">Email пользователя
+        <input id="grantEmailInput" class="auth-input" type="email" autocomplete="off" placeholder="user@example.com">
+      </label>
+      <div id="grantMsg" class="auth-msg" role="alert" style="display:none"></div>
+      <button id="grantAccessBtn" class="auth-btn" type="button">Выдать доступ</button>
+      <p class="profile-section-sub profile-section-sub--gap">Отозвать бессрочный доступ</p>
+      <label class="auth-label">Email пользователя
+        <input id="revokeEmailInput" class="auth-input" type="email" autocomplete="off" placeholder="user@example.com">
+      </label>
+      <div id="revokeMsg" class="auth-msg" role="alert" style="display:none"></div>
+      <button id="revokeAccessBtn" class="auth-btn btn-danger" type="button">Отозвать доступ</button>
+    </div>
+    <button id="backToAppBtn" class="btn-link" type="button">← Назад к тренажёру</button>
+  </div>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://unpkg.com/lucide@0.428.0/dist/umd/lucide.js"></script>
