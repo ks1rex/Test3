@@ -680,13 +680,16 @@ function formatDate(isoStr) {
 
 function updateAccessPill(expiresAt, unlimited) {
   if (unlimited) {
-    accessPill.innerHTML = `<i data-lucide="infinity"></i> Бессрочный доступ`;
+    accessPill.innerHTML = `<i data-lucide="infinity"></i><span class="pill-text"> Бессрочный доступ</span>`;
+    accessPill.title = "Бессрочный доступ";
     accessPill.style.display = "";
     lucide.createIcons();
     return;
   }
   if (!expiresAt) { accessPill.style.display = "none"; return; }
-  accessPill.innerHTML = `<i data-lucide="clock"></i> Доступ до ${formatDate(expiresAt)}`;
+  const dateStr = formatDate(expiresAt);
+  accessPill.innerHTML = `<i data-lucide="clock"></i><span class="pill-text"> Доступ до ${dateStr}</span>`;
+  accessPill.title = `Доступ до ${dateStr}`;
   accessPill.style.display = "";
   lucide.createIcons();
 }
