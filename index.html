@@ -178,14 +178,27 @@
   <div id="sessionComplete" style="display:none">
     <div class="session-complete-icon"><i data-lucide="check-circle-2"></i></div>
     <p class="session-complete-title">Сессия завершена</p>
+    <div class="session-stat session-stat--hero">
+      <strong id="sessionPct">0%</strong>
+      <span>результат</span>
+    </div>
     <div class="session-complete-stats row">
-      <div class="session-stat"><strong id="sessionCorrect">0</strong><span>правильно</span></div>
-      <div class="session-stat session-stat--error"><strong id="sessionErrors">0</strong><span>ошибок</span></div>
-      <div class="session-stat"><strong id="sessionPct">0%</strong><span>результат</span></div>
+      <div class="session-stat">
+        <strong><span id="sessionCorrect">0</span>/<span id="sessionTotal">0</span></strong>
+        <span>правильно</span>
+      </div>
+      <div class="session-stat session-stat--error">
+        <strong id="sessionErrors">0</strong>
+        <span>ошибок</span>
+      </div>
+      <div class="session-stat">
+        <strong id="sessionTime">—</strong>
+        <span>время</span>
+      </div>
     </div>
     <div class="row session-complete-actions">
-      <button id="restartSessionBtn" class="btn-primary"><i data-lucide="rotate-ccw"></i> Начать заново</button>
-      <button id="repeatWrongSessionBtn" class="btn-outline" style="display:none"><i data-lucide="alert-circle"></i> Повторить ошибки</button>
+      <button id="repeatWrongSessionBtn" class="btn-primary" style="display:none"><i data-lucide="rotate-ccw"></i> Повторить ошибки</button>
+      <button id="restartSessionBtn" class="btn-outline"><i data-lucide="refresh-cw"></i> Начать заново</button>
     </div>
   </div>
 </div>

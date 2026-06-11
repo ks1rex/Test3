@@ -45,6 +45,8 @@ const sessionComplete = document.getElementById("sessionComplete");
 const sessionCorrectEl = document.getElementById("sessionCorrect");
 const sessionErrorsEl = document.getElementById("sessionErrors");
 const sessionPctEl = document.getElementById("sessionPct");
+const sessionTotalEl = document.getElementById("sessionTotal");
+const sessionTimeEl = document.getElementById("sessionTime");
 const restartSessionBtn = document.getElementById("restartSessionBtn");
 const repeatWrongSessionBtn = document.getElementById("repeatWrongSessionBtn");
 const kbHint = document.getElementById("kbHint");
@@ -72,6 +74,7 @@ let idx = 0;
 let wrongSet = new Set();
 let lastStart = 0;
 let lastEnd = 0;
+let sessionStartTime = 0;
 
 hideVariantsElem.onchange = () => {
   showQA();
@@ -180,16 +183,41 @@ function showStep(){
 }
 
 /* ========== SESSION COMPLETE ========== */
+function formatSessionTime(ms) {
+  const totalSec = Math.floor(ms / 1000);
+  const h = Math.floor(totalSec / 3600);
+  const m = Math.floor((totalSec % 3600) / 60);
+  const s = totalSec % 60;
+  if (h > 0) return h + ':' + String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+  return m + ':' + String(s).padStart(2, '0');
+}
+
 function showSessionComplete() {
   hideAnswer();
   const total = order.length;
   const errors = wrongSet.size;
   const correct = total - errors;
   const pct = total > 0 ? Math.round(correct / total * 100) : 0;
+  const elapsed = sessionStartTime ? Date.now() - sessionStartTime : 0;
+
   sessionCorrectEl.textContent = correct;
+  sessionTotalEl.textContent = total;
   sessionErrorsEl.textContent = errors;
   sessionPctEl.textContent = pct + '%';
-  repeatWrongSessionBtn.style.display = errors > 0 ? '' : 'none';
+  sessionTimeEl.textContent = elapsed > 0 ? formatSessionTime(elapsed) : '—';
+
+  const heroStat = sessionComplete.querySelector('.session-stat--hero');
+  if (heroStat) heroStat.classList.toggle('session-stat--success', errors === 0);
+
+  if (errors > 0) {
+    repeatWrongSessionBtn.className = 'btn-primary';
+    repeatWrongSessionBtn.style.display = '';
+    restartSessionBtn.className = 'btn-outline';
+  } else {
+    repeatWrongSessionBtn.style.display = 'none';
+    restartSessionBtn.className = 'btn-primary';
+  }
+
   kbHint.style.display = 'none';
   drillContent.style.display = 'none';
   sessionComplete.style.display = '';
@@ -628,6 +656,7 @@ startBtn.onclick = () => {
   }
   lastStart = start;
   lastEnd = end;
+  sessionStartTime = Date.now();
   buildOrder(start, end);
   showQA();
   maybeShowKbHint();
@@ -635,6 +664,7 @@ startBtn.onclick = () => {
 
 wrongOnlyBtn.onclick = () => {
   if (!wrongSet.size) return;
+  sessionStartTime = Date.now();
   order = Array.from(wrongSet);
   if (shuffleElem.checked) fisherYates(order);
   idx = 0;
@@ -643,6 +673,7 @@ wrongOnlyBtn.onclick = () => {
 };
 
 restartSessionBtn.onclick = () => {
+  sessionStartTime = Date.now();
   buildOrder(lastStart, lastEnd);
   showQA();
   maybeShowKbHint();
@@ -650,6 +681,7 @@ restartSessionBtn.onclick = () => {
 
 repeatWrongSessionBtn.onclick = () => {
   if (!wrongSet.size) return;
+  sessionStartTime = Date.now();
   order = Array.from(wrongSet);
   if (shuffleElem.checked) fisherYates(order);
   idx = 0;

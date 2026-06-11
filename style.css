@@ -661,30 +661,51 @@ kbd {
 /* ===== SESSION COMPLETE ===== */
 #sessionComplete {
   text-align: center;
-  padding: 12px 0;
+  padding: 20px 0 16px;
 }
-.session-complete-icon { color: var(--accent); margin-bottom: 10px; }
-.session-complete-icon .lucide { width: 48px; height: 48px; }
+.session-complete-icon { color: var(--accent); margin-bottom: 12px; }
+.session-complete-icon .lucide { width: 44px; height: 44px; }
 .session-complete-title {
-  font-size: 1.1em;
-  font-weight: 700;
-  margin: 0 0 20px;
+  font-size: 0.9em;
+  font-weight: 600;
+  color: var(--muted);
+  margin: 0 0 16px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
 }
+/* Hero: the % result */
+.session-stat--hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 20px;
+}
+.session-stat--hero strong {
+  font-size: 3.4em;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--text-color);
+}
+.session-stat--hero span { font-size: 0.8em; color: var(--muted); }
+/* Perfect score: % turns green */
+.session-stat--success strong { color: var(--success); }
+/* Supporting stats row */
 .session-complete-stats {
   justify-content: center;
-  gap: 28px;
-  margin-bottom: 20px;
+  gap: 24px;
+  margin-bottom: 24px;
 }
 .session-stat {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
+  gap: 3px;
 }
-.session-stat strong { font-size: 2em; font-weight: 700; line-height: 1; }
-.session-stat span { font-size: 0.82em; color: var(--muted); }
+.session-stat strong { font-size: 1.5em; font-weight: 700; line-height: 1; }
+.session-stat span { font-size: 0.78em; color: var(--muted); }
 .session-stat--error strong { color: var(--error); }
-.session-complete-actions { justify-content: center; }
+.session-complete-actions { justify-content: center; flex-wrap: wrap; gap: 10px; }
 
 /* ===== PILL TOAST ===== */
 .pill-toast {
@@ -738,6 +759,9 @@ kbd {
   .pill { font-size: 0.8em; }
   .row { gap: 6px; }
   select { width: 100%; max-width: 100%; }
+  .session-complete-actions { flex-direction: column; align-items: stretch; }
+  .session-complete-actions button { justify-content: center; }
+  .session-stat--hero strong { font-size: 2.8em; }
   #answerContainer > div {
     display: flex;
     flex-direction: column;
