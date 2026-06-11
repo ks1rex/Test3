@@ -12,6 +12,7 @@
   --accent-hover: #0f8f82;
   --accent-btn: #0b7a6e;
   --accent-btn-hover: #09665c;
+  --accent-text: #14a89a;
   --border-color: #34445c;
   --success: #2e8b57;
   --success-bg: rgba(46, 139, 87, 0.14);
@@ -38,6 +39,7 @@
   --accent-hover: #0a7068;
   --accent-btn: #0c6a60;
   --accent-btn-hover: #0a5850;
+  --accent-text: #0c6a60;
   --border-color: #dde3ea;
   --success: #2e8b57;
   --success-bg: #e8f5e9;
@@ -192,7 +194,7 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   background: var(--panel-color);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-input);
-  color: var(--accent);
+  color: var(--accent-text);
   display: none;
   line-height: 1.6;
   overflow-wrap: break-word;
@@ -306,7 +308,7 @@ select:focus, input[type=number]:focus { outline: none; border-color: var(--acce
 .auth-input {
   width: 100%;
   padding: 10px 12px;
-  font-size: 15px;
+  font-size: 16px;
   background: var(--bg-color);
   color: var(--text-color);
   border: 1px solid var(--border-color);
@@ -315,7 +317,7 @@ select:focus, input[type=number]:focus { outline: none; border-color: var(--acce
   transition: border-color 0.15s;
 }
 .auth-input:focus { outline: none; border-color: var(--accent); }
-.auth-input::placeholder { color: var(--muted); opacity: 0.7; }
+.auth-input::placeholder { color: var(--muted); }
 
 /* primary auth button */
 .auth-btn {
@@ -437,6 +439,8 @@ label .lucide { width: 16px; height: 16px; }
 @media (max-width: 480px) {
   body { margin: 12px; }
   button { min-height: 44px; }
+  .btn-icon { min-width: 44px; }
+  .password-toggle { min-height: 44px; min-width: 44px; }
   .pill { font-size: 0.8em; }
   .row { gap: 6px; }
   select { width: 100%; max-width: 100%; }

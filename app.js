@@ -602,6 +602,7 @@ const passwordToggle = document.getElementById("passwordToggle");
   el.addEventListener("keydown", e => { if (e.key === "Enter") authSubmitBtn.click(); });
 });
 codeInput.addEventListener("keydown", e => { if (e.key === "Enter") activateBtn.click(); });
+authForm.addEventListener("submit", e => e.preventDefault());
 
 let isSignInMode = true;
 
@@ -609,6 +610,8 @@ function setAuthMode(isSignIn) {
   isSignInMode = isSignIn;
   tabSignIn.classList.toggle("tab-active", isSignIn);
   tabSignUp.classList.toggle("tab-active", !isSignIn);
+  tabSignIn.setAttribute("aria-selected", String(isSignIn));
+  tabSignUp.setAttribute("aria-selected", String(!isSignIn));
   authSubmitBtn.textContent = isSignIn ? "Войти" : "Зарегистрироваться";
   authPassword.autocomplete = isSignIn ? "current-password" : "new-password";
   authError.style.display = "none";

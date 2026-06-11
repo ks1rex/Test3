@@ -10,19 +10,19 @@
 
 <!-- ===== LOADING SCREEN ===== -->
 <div id="loadingScreen" class="screen-center">
-  <p class="auth-hint loading-dots">Загрузка</p>
+  <p class="auth-hint loading-dots" role="status">Загрузка</p>
 </div>
 
 <!-- ===== AUTH SCREEN ===== -->
 <div id="authScreen" class="screen-center" style="display:none">
   <div class="auth-card panel">
     <h2 class="auth-title brand-title">Мед<span class="brand-accent">Тест</span></h2>
-    <div id="authForm">
-      <div class="auth-tabs row">
-        <button id="tabSignIn" class="tab-btn tab-active">Вход</button>
-        <button id="tabSignUp" class="tab-btn">Регистрация</button>
+    <form id="authForm" novalidate>
+      <div class="auth-tabs row" role="tablist">
+        <button id="tabSignIn" class="tab-btn tab-active" role="tab" aria-selected="true">Вход</button>
+        <button id="tabSignUp" class="tab-btn" role="tab" aria-selected="false">Регистрация</button>
       </div>
-      <div id="authError" class="auth-msg auth-msg--error" style="display:none"></div>
+      <div id="authError" class="auth-msg auth-msg--error" role="alert" style="display:none"></div>
       <label class="auth-label">Email
         <input id="authEmail" class="auth-input" type="email" autocomplete="email" placeholder="you@example.com">
       </label>
@@ -33,8 +33,8 @@
         </div>
       </label>
       <p id="passwordHint" class="auth-hint" style="display:none">Минимум 6 символов</p>
-      <button id="authSubmitBtn" class="auth-btn">Войти</button>
-    </div>
+      <button id="authSubmitBtn" class="auth-btn" type="button">Войти</button>
+    </form>
     <div id="confirmNotice" style="display:none">
       <div id="confirmText" class="auth-msg auth-msg--info"></div>
       <button id="backToSignIn" class="auth-btn">Назад ко входу</button>
@@ -49,7 +49,7 @@
     <h2 class="auth-title brand-title">Мед<span class="brand-accent">Тест</span></h2>
     <p class="auth-subtitle">Активация доступа</p>
     <p id="activationHint" class="auth-hint">Введите код активации, чтобы получить доступ к тренажёру.</p>
-    <div id="activationError" class="auth-msg auth-msg--error" style="display:none"></div>
+    <div id="activationError" class="auth-msg auth-msg--error" role="alert" style="display:none"></div>
     <label class="auth-label">Код активации
       <input id="codeInput" class="auth-input" type="text" placeholder="XXXX-XXXX" maxlength="9" spellcheck="false" autocapitalize="none" autocorrect="off">
     </label>
@@ -61,13 +61,16 @@
 <!-- ===== APP SCREEN ===== -->
 <div id="appScreen" style="display:none">
 
+<header>
 <div class="row app-header">
   <h2 class="brand-title">Мед<span class="brand-accent">Тест</span></h2>
   <button id="themeToggle" class="btn-icon" aria-label="Переключить тему"><i data-lucide="moon"></i></button>
   <span id="accessPill" class="pill access-pill" style="display:none"></span>
   <button id="signOutBtn" class="btn-outline"><i data-lucide="log-out"></i> Выйти</button>
 </div>
+</header>
 
+<main>
 <div class="panel row">
   <label>Тема:
     <select id="topicSelect"></select>
@@ -84,10 +87,10 @@
     <label><input id="hideVariants" type="checkbox"> Скрыть количество вариантов</label>
     <button id="startBtn" class="btn-primary">Начать</button>
   </div>
-  <div id="rangeError" class="range-error" style="display:none"></div>
+  <div id="rangeError" class="range-error" role="alert" style="display:none"></div>
   <div class="row controls-status">
-    <span class="pill">Шаг: <span id="stepInfo">—/—</span></span>
-    <span class="pill">Ошибок: <span id="wrongCount">0</span></span>
+    <span class="pill">Шаг: <span id="stepInfo" aria-live="polite">—/—</span></span>
+    <span class="pill">Ошибок: <span id="wrongCount" aria-live="polite">0</span></span>
     <button id="wrongOnlyBtn" disabled>Ошибочные → новый прогон</button>
   </div>
 </div>
@@ -103,7 +106,7 @@
     <span class="first-run-sep">→</span>
     <span>3.&nbsp;Нажмите <strong>«Начать»</strong></span>
   </div>
-  <textarea id="answerInput" placeholder="Ваш ответ..."></textarea>
+  <textarea id="answerInput" placeholder="Ваш ответ..." aria-label="Ваш ответ"></textarea>
   <div id="answerContainer"></div>
 
   <div class="row">
@@ -123,10 +126,11 @@
   </div>
 </div>
 
+</main>
 </div><!-- /#appScreen -->
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<script src="https://unpkg.com/lucide@0.428.0/dist/umd/lucide.js"></script>
 <script src="auth.js"></script>
 <script src="app.js"></script>
 </body>
