@@ -644,6 +644,7 @@ let currentEmail = '';
 let currentUserId = null;
 let currentExpiresAt = null;
 let currentUnlimited = false;
+let profileLocked = false;
 
 // Enter-to-submit on auth and activation forms
 [authEmail, authPassword].forEach(el => {
@@ -700,21 +701,34 @@ function showAdminMsg(el, text, type) {
   el.style.display = "block";
 }
 
-function showProfileScreen() {
+function showProfileScreen(locked = false) {
+  profileLocked = locked;
   profileEmailElem.textContent = currentEmail;
 
-  if (currentUnlimited) {
-    profileAccessInfo.innerHTML = `<div class="profile-access profile-access--unlimited"><i data-lucide="infinity"></i> Доступ: бессрочный</div>`;
-    profileCodeSection.style.display = "none";
-  } else if (currentExpiresAt) {
-    profileAccessInfo.innerHTML = `<div class="profile-access profile-access--active"><i data-lucide="clock"></i> Доступ активен до ${formatDate(currentExpiresAt)}</div>`;
+  if (locked) {
+    const msg = currentExpiresAt !== null
+      ? `Срок действия доступа истёк ${formatDate(currentExpiresAt)}`
+      : 'У вас нет активного доступа';
+    profileAccessInfo.innerHTML = `<div class="profile-access profile-access--none">${msg}</div>`;
     profileCodeSection.style.display = "";
+    profileRedeemBtn.textContent = "Активировать";
+    adminBlock.style.display = "none";
+    backToAppBtn.style.display = "none";
   } else {
-    profileAccessInfo.innerHTML = `<div class="profile-access profile-access--none">Нет активного доступа</div>`;
-    profileCodeSection.style.display = "";
+    backToAppBtn.style.display = "";
+    profileRedeemBtn.textContent = "Активировать код";
+    if (currentUnlimited) {
+      profileAccessInfo.innerHTML = `<div class="profile-access profile-access--unlimited"><i data-lucide="infinity"></i> Доступ: бессрочный</div>`;
+      profileCodeSection.style.display = "none";
+    } else if (currentExpiresAt) {
+      profileAccessInfo.innerHTML = `<div class="profile-access profile-access--active"><i data-lucide="clock"></i> Доступ активен до ${formatDate(currentExpiresAt)}</div>`;
+      profileCodeSection.style.display = "";
+    } else {
+      profileAccessInfo.innerHTML = `<div class="profile-access profile-access--none">Нет активного доступа</div>`;
+      profileCodeSection.style.display = "";
+    }
+    adminBlock.style.display = currentEmail === ADMIN_EMAIL ? "" : "none";
   }
-
-  adminBlock.style.display = currentEmail === ADMIN_EMAIL ? "" : "none";
 
   profileCodeError.style.display = "none";
   profileCodeSuccess.style.display = "none";
@@ -879,6 +893,7 @@ function resetAppState() {
   currentUserId = null;
   currentExpiresAt = null;
   currentUnlimited = false;
+  profileLocked = false;
 
   updateButtons();
   showStep();
@@ -893,6 +908,8 @@ signOutFromActivation.onclick = async () => {
 
 /* ========== USER MENU ========== */
 function openUserMenu(btn) {
+  menuGoProfile.style.display = profileLocked ? "none" : "";
+  menuGoSubmit.style.display = profileLocked ? "none" : "";
   const rect = btn.getBoundingClientRect();
   userMenuDropdown.style.top = (rect.bottom + 6) + 'px';
   userMenuDropdown.style.right = (window.innerWidth - rect.right) + 'px';
@@ -1051,13 +1068,24 @@ profileRedeemBtn.onclick = async () => {
     return;
   }
 
-  const { expiresAt, unlimited } = await checkAccess();
+  const { expiresAt, unlimited, userId } = await checkAccess();
   currentExpiresAt = expiresAt;
   currentUnlimited = unlimited;
-  updateAccessPill(expiresAt, unlimited);
-  profileCodeSuccess.textContent = `Доступ продлён до ${formatDate(expiresAt)}`;
-  profileCodeSuccess.style.display = "block";
   profileCodeInput.value = "";
+
+  if (profileLocked) {
+    // Locked mode: activation grants access → go to the app
+    currentUserId = userId ?? null;
+    updateAccessPill(expiresAt, unlimited);
+    await initAccess();
+    return;
+  }
+
+  updateAccessPill(expiresAt, unlimited);
+  profileCodeSuccess.textContent = unlimited
+    ? 'Бессрочный доступ активирован!'
+    : `Доступ продлён до ${formatDate(expiresAt)}`;
+  profileCodeSuccess.style.display = "block";
   if (unlimited) {
     profileAccessInfo.innerHTML = `<div class="profile-access profile-access--unlimited"><i data-lucide="infinity"></i> Доступ: бессрочный</div>`;
     profileCodeSection.style.display = "none";
@@ -1236,15 +1264,17 @@ async function initAccess() {
   if (!loggedIn) {
     showScreen(authScreen);
   } else if (!hasAccess) {
-    activationHint.textContent = expiresAt !== null
-      ? `Срок действия доступа истёк ${formatDate(expiresAt)}. Введите новый код для продления.`
-      : "Введите код активации, чтобы получить доступ к тренажёру.";
-    showScreen(activationScreen);
+    currentExpiresAt = expiresAt;
+    currentUnlimited = unlimited;
+    currentEmail = email ?? '';
+    currentUserId = userId ?? null;
+    showProfileScreen(true);
   } else {
     currentExpiresAt = expiresAt;
     currentUnlimited = unlimited;
     currentEmail = email ?? '';
     currentUserId = userId ?? null;
+    profileLocked = false;
     updateAccessPill(expiresAt, unlimited);
     showScreen(appScreen);
     loadTopicList();
