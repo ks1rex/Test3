@@ -87,7 +87,7 @@ async function loadTopicList(){
     const topics = await resp.json();
 
     topicSelect.innerHTML = "";
-    topics.forEach((t, i) => {
+    topics.forEach((t) => {
       const opt = document.createElement("option");
       opt.value = t.file;
       opt.textContent = t.title || t.file;
@@ -146,9 +146,6 @@ async function loadTopic(filename){
       : Array.isArray(data.questions)
         ? data.questions
         : [];
-
-
-    if(!Array.isArray(QA)) QA = [];
 
     rangeStartElem.value = 1;
     rangeEndElem.value = QA.length || 1;
@@ -222,6 +219,7 @@ function showSessionComplete() {
   drillContent.style.display = 'none';
   sessionComplete.style.display = '';
   showStep();
+  updateButtons();
   lucide.createIcons();
 }
 
