@@ -617,10 +617,6 @@ const passwordToggle = document.getElementById("passwordToggle");
 /* ========== USER MENU REFS ========== */
 const userMenuBtn = document.getElementById("userMenuBtn");
 const profileUserMenuBtn = document.getElementById("profileUserMenuBtn");
-const userMenuDropdown = document.getElementById("userMenuDropdown");
-const menuGoProfile = document.getElementById("menuGoProfile");
-const menuGoSubmit = document.getElementById("menuGoSubmit");
-const menuSignOut = document.getElementById("menuSignOut");
 
 /* ========== PROFILE SCREEN REFS ========== */
 const profileEmailElem = document.getElementById("profileEmail");
@@ -894,6 +890,7 @@ function resetAppState() {
   currentExpiresAt = null;
   currentUnlimited = false;
   profileLocked = false;
+  closeAllMenus();
 
   updateButtons();
   showStep();
@@ -907,62 +904,55 @@ signOutFromActivation.onclick = async () => {
 };
 
 /* ========== USER MENU ========== */
+function closeAllMenus() {
+  document.querySelectorAll('.user-menu-dropdown').forEach(d => { d.style.display = 'none'; });
+  document.querySelectorAll('.user-avatar-btn').forEach(b => { b.setAttribute('aria-expanded', 'false'); });
+}
+
 function openUserMenu(btn) {
-  menuGoProfile.style.display = profileLocked ? "none" : "";
-  menuGoSubmit.style.display = profileLocked ? "none" : "";
-  const rect = btn.getBoundingClientRect();
-  userMenuDropdown.style.top = (rect.bottom + 6) + 'px';
-  userMenuDropdown.style.right = (window.innerWidth - rect.right) + 'px';
-  userMenuDropdown.style.left = 'auto';
-  userMenuDropdown.style.display = '';
+  closeAllMenus();
+  const wrap = btn.closest('.user-menu-wrap');
+  const dropdown = wrap.querySelector('.user-menu-dropdown');
+  const onProfileScreen = profileScreen.style.display !== 'none';
+  wrap.querySelectorAll('[data-action="profile"]').forEach(el => {
+    el.style.display = (profileLocked || onProfileScreen) ? "none" : "";
+  });
+  wrap.querySelectorAll('[data-action="submit"]').forEach(el => {
+    el.style.display = profileLocked ? "none" : "";
+  });
+  wrap.querySelectorAll('.user-menu-sep').forEach(sep => {
+    sep.style.display = profileLocked ? "none" : "";
+  });
+  dropdown.style.display = '';
   btn.setAttribute('aria-expanded', 'true');
 }
 
-function closeUserMenu() {
-  userMenuDropdown.style.display = 'none';
-  userMenuBtn.setAttribute('aria-expanded', 'false');
-  profileUserMenuBtn.setAttribute('aria-expanded', 'false');
-}
-
-function toggleUserMenu(btn) {
-  if (userMenuDropdown.style.display === 'none' || userMenuDropdown.style.display === '') {
-    // Check actual computed visibility
-    if (userMenuDropdown.offsetParent === null && userMenuDropdown.style.display === '') {
-      openUserMenu(btn);
-    } else if (userMenuDropdown.style.display === 'none') {
-      openUserMenu(btn);
-    } else {
-      closeUserMenu();
-    }
-  } else {
-    closeUserMenu();
-  }
-}
-
-userMenuBtn.onclick = (e) => {
-  e.stopPropagation();
-  userMenuDropdown.style.display !== 'none' ? closeUserMenu() : openUserMenu(userMenuBtn);
-};
-profileUserMenuBtn.onclick = (e) => {
-  e.stopPropagation();
-  userMenuDropdown.style.display !== 'none' ? closeUserMenu() : openUserMenu(profileUserMenuBtn);
-};
-document.addEventListener('click', (e) => {
-  if (userMenuDropdown.style.display !== 'none' && !userMenuDropdown.contains(e.target)) {
-    closeUserMenu();
-  }
+[userMenuBtn, profileUserMenuBtn].forEach(btn => {
+  btn.onclick = (e) => {
+    e.stopPropagation();
+    const dropdown = btn.closest('.user-menu-wrap').querySelector('.user-menu-dropdown');
+    dropdown.style.display !== 'none' ? closeAllMenus() : openUserMenu(btn);
+  };
 });
 
-menuGoProfile.onclick = () => { closeUserMenu(); showProfileScreen(); };
-menuGoSubmit.onclick = () => { closeUserMenu(); showSubmitTestScreen(); };
-menuSignOut.onclick = async () => {
-  closeUserMenu();
-  menuSignOut.disabled = true;
-  await signOut();
-  resetAppState();
-  menuSignOut.disabled = false;
-  showScreen(authScreen);
-};
+document.addEventListener('click', async (e) => {
+  const item = e.target.closest('.user-menu-item[data-action]');
+  if (item) {
+    const action = item.dataset.action;
+    closeAllMenus();
+    if (action === 'profile') { showProfileScreen(); }
+    else if (action === 'submit') { showSubmitTestScreen(); }
+    else if (action === 'signout') {
+      item.disabled = true;
+      await signOut();
+      item.disabled = false;
+      resetAppState();
+      showScreen(authScreen);
+    }
+    return;
+  }
+  if (!e.target.closest('.user-menu-wrap')) closeAllMenus();
+});
 
 backToAppBtn.onclick = () => showScreen(appScreen);
 

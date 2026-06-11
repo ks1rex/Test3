@@ -101,7 +101,15 @@
   <div class="header-break" aria-hidden="true"></div>
   <div class="header-right">
     <span id="accessPill" class="pill access-pill" style="display:none"></span>
-    <button id="userMenuBtn" class="user-avatar-btn" aria-label="Меню пользователя" aria-haspopup="true" aria-expanded="false"><i data-lucide="user"></i></button>
+    <div class="user-menu-wrap">
+      <button id="userMenuBtn" class="user-avatar-btn" aria-label="Меню пользователя" aria-haspopup="true" aria-expanded="false"><i data-lucide="user"></i></button>
+      <div class="user-menu-dropdown" style="display:none" role="menu" aria-label="Меню пользователя">
+        <button class="user-menu-item" data-action="profile" role="menuitem"><i data-lucide="user"></i> Мой профиль</button>
+        <button class="user-menu-item" data-action="submit" role="menuitem"><i data-lucide="file-plus"></i> Предложить тест</button>
+        <div class="user-menu-sep"></div>
+        <button class="user-menu-item user-menu-item--danger" data-action="signout" role="menuitem"><i data-lucide="log-out"></i> Выйти</button>
+      </div>
+    </div>
   </div>
 </div>
 </header>
@@ -169,7 +177,15 @@
 <div id="profileScreen" class="screen-center" style="display:none">
   <div class="auth-card panel profile-card">
     <div class="profile-topbar">
-      <button id="profileUserMenuBtn" class="user-avatar-btn" aria-label="Меню пользователя" aria-haspopup="true" aria-expanded="false"><i data-lucide="user"></i></button>
+      <div class="user-menu-wrap">
+        <button id="profileUserMenuBtn" class="user-avatar-btn" aria-label="Меню пользователя" aria-haspopup="true" aria-expanded="false"><i data-lucide="user"></i></button>
+        <div class="user-menu-dropdown" style="display:none" role="menu" aria-label="Меню пользователя">
+          <button class="user-menu-item" data-action="profile" role="menuitem"><i data-lucide="user"></i> Мой профиль</button>
+          <button class="user-menu-item" data-action="submit" role="menuitem"><i data-lucide="file-plus"></i> Предложить тест</button>
+          <div class="user-menu-sep"></div>
+          <button class="user-menu-item user-menu-item--danger" data-action="signout" role="menuitem"><i data-lucide="log-out"></i> Выйти</button>
+        </div>
+      </div>
     </div>
     <h2 class="auth-title brand-title">Мед<span class="brand-accent">Тест</span></h2>
     <p class="auth-subtitle">Профиль</p>
@@ -229,14 +245,6 @@
     <button id="submitTestBtn" class="auth-btn" type="button">Отправить</button>
     <button id="backFromSubmitBtn" class="btn-link" type="button">← Назад к тренажёру</button>
   </div>
-</div>
-
-<!-- ===== USER MENU DROPDOWN ===== -->
-<div id="userMenuDropdown" class="user-menu-dropdown" style="display:none" role="menu" aria-label="Меню пользователя">
-  <button id="menuGoProfile" class="user-menu-item" role="menuitem"><i data-lucide="user"></i> Мой профиль</button>
-  <button id="menuGoSubmit" class="user-menu-item" role="menuitem"><i data-lucide="file-plus"></i> Предложить тест</button>
-  <div class="user-menu-sep"></div>
-  <button id="menuSignOut" class="user-menu-item user-menu-item--danger" role="menuitem"><i data-lucide="log-out"></i> Выйти</button>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
