@@ -132,7 +132,6 @@
   </div>
   <div id="rangeError" class="range-error" role="alert" style="display:none"></div>
   <div class="row controls-status">
-    <span class="pill">Шаг: <span id="stepInfo" aria-live="polite">—/—</span></span>
     <span class="pill">Ошибок: <span id="wrongCount" aria-live="polite">0</span></span>
     <button id="wrongOnlyBtn" disabled><i data-lucide="rotate-ccw"></i> Повторить ошибки</button>
   </div>
@@ -142,6 +141,7 @@
 
 <div class="panel">
   <div id="drillContent">
+    <div class="drill-progress"><span class="pill">Шаг: <span id="stepInfo" aria-live="polite">—/—</span></span></div>
     <div id="question" aria-live="polite">Выберите тему</div>
     <div id="firstRunHint" class="first-run-hint" style="display:none">
       <span>1.&nbsp;Выберите тему</span>
@@ -155,8 +155,8 @@
 
     <div class="row">
       <button id="checkBtn" class="btn-primary" disabled>Показать ответ</button>
-      <button id="markRightBtn" disabled>Верно</button>
-      <button id="markWrongBtn" disabled>Неверно</button>
+      <button id="markRightBtn" disabled style="display:none">Верно</button>
+      <button id="markWrongBtn" disabled style="display:none">Неверно</button>
     </div>
 
     <div id="kbHint" class="kb-hint" style="display:none">
@@ -182,6 +182,7 @@
       <strong id="sessionPct">0%</strong>
       <span>результат</span>
     </div>
+    <p id="sessionBand" class="session-band"></p>
     <div class="session-complete-stats row">
       <div class="session-stat">
         <strong><span id="sessionCorrect">0</span>/<span id="sessionTotal">0</span></strong>

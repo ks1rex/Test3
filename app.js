@@ -47,6 +47,7 @@ const sessionErrorsEl = document.getElementById("sessionErrors");
 const sessionPctEl = document.getElementById("sessionPct");
 const sessionTotalEl = document.getElementById("sessionTotal");
 const sessionTimeEl = document.getElementById("sessionTime");
+const sessionBandEl = document.getElementById("sessionBand");
 const restartSessionBtn = document.getElementById("restartSessionBtn");
 const repeatWrongSessionBtn = document.getElementById("repeatWrongSessionBtn");
 const kbHint = document.getElementById("kbHint");
@@ -202,6 +203,16 @@ function showSessionComplete() {
   sessionErrorsEl.textContent = errors;
   sessionPctEl.textContent = pct + '%';
   sessionTimeEl.textContent = elapsed > 0 ? formatSessionTime(elapsed) : '—';
+
+  if (sessionBandEl) {
+    let band = '';
+    if (errors === 0)       band = 'Все вопросы верно';
+    else if (pct >= 90)     band = 'Отличный результат';
+    else if (pct >= 70)     band = 'Хороший результат';
+    else if (pct >= 50)     band = 'Есть над чем работать';
+    else                    band = 'Нужно ещё потренироваться';
+    sessionBandEl.textContent = band;
+  }
 
   const heroStat = sessionComplete.querySelector('.session-stat--hero');
   if (heroStat) heroStat.classList.toggle('session-stat--success', errors === 0);
@@ -596,7 +607,9 @@ function showAnswer() {
   correctBox.style.display = "block";
 
   markRightBtn.disabled = false;
+  markRightBtn.style.display = '';
   markWrongBtn.disabled = false;
+  markWrongBtn.style.display = '';
   checkBtn.textContent = "Скрыть ответ";
 }
 
@@ -608,7 +621,9 @@ function hideAnswer() {
   resultBox.className = "";
 
   markRightBtn.disabled = true;
+  markRightBtn.style.display = 'none';
   markWrongBtn.disabled = true;
+  markWrongBtn.style.display = 'none';
   checkBtn.textContent = "Показать ответ";
 }
 

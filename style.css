@@ -17,9 +17,9 @@
   --success: #2e8b57;
   --success-bg: rgba(46, 139, 87, 0.14);
   --success-border: rgba(46, 139, 87, 0.4);
-  --error: #c0392b;
-  --error-bg: rgba(192, 57, 43, 0.14);
-  --error-border: rgba(192, 57, 43, 0.4);
+  --error: #f57a6d;
+  --error-bg: rgba(245, 122, 109, 0.14);
+  --error-border: rgba(245, 122, 109, 0.4);
   --shadow: 0 2px 16px rgba(0, 0, 0, 0.4);
   --radius-card: 14px;
   --radius-btn: 10px;
@@ -566,9 +566,9 @@ label .lucide { width: 16px; height: 16px; }
 .profile-section-sub--gap { margin-top: 10px; }
 
 .btn-danger {
-  background: var(--error);
+  background: #c0392b;
   color: #fff;
-  border-color: var(--error);
+  border-color: #c0392b;
 }
 .btn-danger:hover:not(:disabled) {
   background: #a93226;
@@ -658,6 +658,13 @@ kbd {
 }
 .kb-hint-dismiss:hover:not(:disabled) { color: var(--text-color); background: var(--button-bg); }
 
+/* ===== DRILL PROGRESS ===== */
+.drill-progress {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 10px;
+}
+
 /* ===== SESSION COMPLETE ===== */
 #sessionComplete {
   text-align: center;
@@ -706,6 +713,12 @@ kbd {
 .session-stat span { font-size: 0.78em; color: var(--muted); }
 .session-stat--error strong { color: var(--error); }
 .session-complete-actions { justify-content: center; flex-wrap: wrap; gap: 10px; }
+.session-band {
+  font-size: 0.88em;
+  color: var(--muted);
+  margin: -12px 0 20px;
+  text-align: center;
+}
 
 /* ===== PILL TOAST ===== */
 .pill-toast {
