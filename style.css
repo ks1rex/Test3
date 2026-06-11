@@ -74,6 +74,12 @@ h2 { margin: 0 0 10px; }
   box-shadow: var(--shadow);
 }
 
+/* ===== APP SCREEN ===== */
+#appScreen {
+  max-width: 860px;
+  margin: 0 auto;
+}
+
 /* ===== BUTTONS — base ===== */
 button {
   padding: 8px 14px;
@@ -170,6 +176,7 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   line-height: 1.6;
   margin: 0 0 14px;
   overflow-wrap: break-word;
+  text-wrap: pretty;
 }
 
 /* ===== ANSWER TEXTAREA ===== */
@@ -186,6 +193,7 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   transition: border-color 0.15s;
 }
 #answerInput:focus { outline: none; border-color: var(--accent); }
+#answerInput:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
 /* ===== CORRECT ANSWER BOX ===== */
 #correctBox {
@@ -198,6 +206,7 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   display: none;
   line-height: 1.6;
   overflow-wrap: break-word;
+  text-wrap: pretty;
 }
 
 /* ===== RESULT BOX ===== */
@@ -228,8 +237,10 @@ select, input[type=number] {
   border-radius: var(--radius-input);
   padding: 6px 8px;
   font-size: 0.92em;
+  transition: border-color 0.15s;
 }
 select:focus, input[type=number]:focus { outline: none; border-color: var(--accent); }
+select:focus-visible, input[type=number]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
 /* ===== LOADING SCREEN ===== */
 @keyframes dots {
@@ -317,6 +328,7 @@ select:focus, input[type=number]:focus { outline: none; border-color: var(--acce
   transition: border-color 0.15s;
 }
 .auth-input:focus { outline: none; border-color: var(--accent); }
+.auth-input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .auth-input::placeholder { color: var(--muted); }
 
 /* primary auth button */
