@@ -65,7 +65,7 @@
     <p id="activationHint" class="auth-hint">Введите код активации, чтобы получить доступ к тренажёру.</p>
     <div id="activationError" class="auth-msg auth-msg--error" role="alert" style="display:none"></div>
     <label class="auth-label">Код активации
-      <input id="codeInput" class="auth-input" type="text" placeholder="XXXX-XXXX" maxlength="9" spellcheck="false" autocapitalize="none" autocorrect="off">
+      <input id="codeInput" class="auth-input" type="text" placeholder="XXXX-XXXX" maxlength="32" spellcheck="false" autocapitalize="none" autocorrect="off">
     </label>
     <button id="activateBtn" class="auth-btn">Активировать</button>
     <button id="signOutFromActivation" class="btn-link">Выйти из аккаунта</button>
@@ -230,7 +230,7 @@
     <div id="profileAccessInfo"></div>
     <div id="profileCodeSection">
       <label class="auth-label">Код активации
-        <input id="profileCodeInput" class="auth-input" type="text" placeholder="XXXX-XXXX" maxlength="9" spellcheck="false" autocapitalize="none" autocorrect="off">
+        <input id="profileCodeInput" class="auth-input" type="text" placeholder="XXXX-XXXX" maxlength="32" spellcheck="false" autocapitalize="none" autocorrect="off">
       </label>
       <div id="profileCodeError" class="auth-msg auth-msg--error" role="alert" style="display:none"></div>
       <div id="profileCodeSuccess" class="auth-msg auth-msg--info" style="display:none"></div>
