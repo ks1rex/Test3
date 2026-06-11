@@ -40,6 +40,22 @@ const hideVariantsElem = document.getElementById("hideVariants");
 const resultBox = document.getElementById("resultBox");
 const firstRunHint = document.getElementById("firstRunHint");
 const rangeError = document.getElementById("rangeError");
+
+/* ========== DOM REFS — reset password ========== */
+const resetPasswordScreen = document.getElementById("resetPasswordScreen");
+const forgotPasswordForm = document.getElementById("forgotPasswordForm");
+const forgotPasswordBtn = document.getElementById("forgotPasswordBtn");
+const forgotEmailInput = document.getElementById("forgotEmail");
+const forgotError = document.getElementById("forgotError");
+const forgotSuccess = document.getElementById("forgotSuccess");
+const sendResetBtn = document.getElementById("sendResetBtn");
+const backFromForgot = document.getElementById("backFromForgot");
+const resetPasswordInput = document.getElementById("resetPassword");
+const resetPasswordToggle = document.getElementById("resetPasswordToggle");
+const resetError = document.getElementById("resetError");
+const resetSuccess = document.getElementById("resetSuccess");
+const savePasswordBtn = document.getElementById("savePasswordBtn");
+
 /* ========== STATE ========== */
 let QA = [];
 let order = [];
@@ -572,7 +588,7 @@ const activationScreen = document.getElementById("activationScreen");
 const appScreen = document.getElementById("appScreen");
 
 function showScreen(screen) {
-  [loadingScreen, authScreen, activationScreen, appScreen].forEach(s => { s.style.display = "none"; });
+  [loadingScreen, authScreen, activationScreen, appScreen, resetPasswordScreen].forEach(s => { s.style.display = "none"; });
   screen.style.display = "";
 }
 
@@ -603,6 +619,8 @@ const passwordToggle = document.getElementById("passwordToggle");
 });
 codeInput.addEventListener("keydown", e => { if (e.key === "Enter") activateBtn.click(); });
 authForm.addEventListener("submit", e => e.preventDefault());
+forgotEmailInput.addEventListener("keydown", e => { if (e.key === "Enter") sendResetBtn.click(); });
+resetPasswordInput.addEventListener("keydown", e => { if (e.key === "Enter") savePasswordBtn.click(); });
 
 let isSignInMode = true;
 
@@ -616,6 +634,7 @@ function setAuthMode(isSignIn) {
   authPassword.autocomplete = isSignIn ? "current-password" : "new-password";
   authError.style.display = "none";
   passwordHint.style.display = isSignIn ? "none" : "";
+  forgotPasswordBtn.style.display = isSignIn ? "" : "none";
   // reset password visibility on tab switch
   authPassword.type = "password";
   passwordToggle.setAttribute("aria-label", "Показать пароль");
@@ -805,6 +824,106 @@ signOutFromActivation.onclick = async () => {
   showScreen(authScreen);
 };
 
+/* ========== FORGOT PASSWORD ========== */
+forgotPasswordBtn.onclick = () => {
+  authForm.style.display = "none";
+  forgotPasswordForm.style.display = "";
+  forgotEmailInput.value = authEmail.value;
+  forgotError.style.display = "none";
+  forgotSuccess.style.display = "none";
+  sendResetBtn.style.display = "";
+  sendResetBtn.disabled = false;
+};
+
+backFromForgot.onclick = () => {
+  forgotPasswordForm.style.display = "none";
+  authForm.style.display = "";
+  setAuthMode(true);
+};
+
+sendResetBtn.onclick = async () => {
+  const email = forgotEmailInput.value.trim();
+  if (!email || !/.+@.+\..+/.test(email)) {
+    forgotError.textContent = "Введите корректный email-адрес.";
+    forgotError.style.display = "block";
+    return;
+  }
+  forgotError.style.display = "none";
+  const prev = sendResetBtn.textContent;
+  sendResetBtn.disabled = true;
+  sendResetBtn.textContent = "Отправка…";
+
+  const { error } = await resetPasswordForEmail(email);
+
+  sendResetBtn.disabled = false;
+  sendResetBtn.textContent = prev;
+
+  if (error) {
+    forgotError.textContent = translateAuthError(error.message);
+    forgotError.style.display = "block";
+    return;
+  }
+
+  forgotSuccess.textContent = "Если аккаунт с таким email существует, на него отправлена ссылка для сброса пароля.";
+  forgotSuccess.style.display = "block";
+  sendResetBtn.style.display = "none";
+};
+
+/* ========== RESET PASSWORD SCREEN ========== */
+resetPasswordToggle.onclick = () => {
+  const isHidden = resetPasswordInput.type === "password";
+  resetPasswordInput.type = isHidden ? "text" : "password";
+  resetPasswordToggle.setAttribute("aria-label", isHidden ? "Скрыть пароль" : "Показать пароль");
+  const pi = resetPasswordToggle.querySelector("i");
+  if (pi) { pi.dataset.lucide = isHidden ? "eye-off" : "eye"; lucide.createIcons(); }
+};
+
+savePasswordBtn.onclick = async () => {
+  const pwd = resetPasswordInput.value;
+  if (!pwd || pwd.length < 6) {
+    resetError.textContent = "Пароль должен содержать минимум 6 символов.";
+    resetError.style.display = "block";
+    return;
+  }
+  resetError.style.display = "none";
+  const prev = savePasswordBtn.textContent;
+  savePasswordBtn.disabled = true;
+  savePasswordBtn.textContent = "Сохранение…";
+
+  const { error } = await updateUserPassword(pwd);
+
+  savePasswordBtn.disabled = false;
+  savePasswordBtn.textContent = prev;
+
+  if (error) {
+    resetError.textContent = translateAuthError(error.message);
+    resetError.style.display = "block";
+    return;
+  }
+
+  resetSuccess.textContent = "Пароль успешно изменён.";
+  resetSuccess.style.display = "block";
+  savePasswordBtn.style.display = "none";
+
+  setTimeout(async () => {
+    recoveryMode = false;
+    resetPasswordInput.value = "";
+    resetPasswordInput.type = "password";
+    resetPasswordToggle.setAttribute("aria-label", "Показать пароль");
+    const pi = resetPasswordToggle.querySelector("i");
+    if (pi) { pi.dataset.lucide = "eye"; lucide.createIcons(); }
+    resetError.style.display = "none";
+    resetSuccess.style.display = "none";
+    savePasswordBtn.style.display = "";
+    savePasswordBtn.disabled = false;
+    savePasswordBtn.textContent = "Сохранить новый пароль";
+    await initAccess();
+  }, 2000);
+};
+
+/* ========== INIT ========== */
+let recoveryMode = false;
+
 async function initAccess() {
   showScreen(loadingScreen);
   let result;
@@ -815,6 +934,7 @@ async function initAccess() {
     showAuthError('Ошибка соединения. Проверьте интернет и обновите страницу.');
     return;
   }
+  if (recoveryMode) return;
   const { loggedIn, hasAccess, expiresAt } = result;
   if (!loggedIn) {
     showScreen(authScreen);
@@ -830,7 +950,18 @@ async function initAccess() {
   }
 }
 
-/* ========== INIT ========== */
+supabaseClient.auth.onAuthStateChange((event, session) => {
+  if (event === 'PASSWORD_RECOVERY') {
+    recoveryMode = true;
+    showScreen(resetPasswordScreen);
+    resetError.style.display = "none";
+    resetSuccess.style.display = "none";
+    resetPasswordInput.value = "";
+    savePasswordBtn.style.display = "";
+    savePasswordBtn.disabled = false;
+    savePasswordBtn.textContent = "Сохранить новый пароль";
+  }
+});
 initAccess();
 /* ========== KEYBOARD SHORTCUTS (fixed toggle) ========== */
 document.addEventListener("keydown", (e) => {
