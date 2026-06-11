@@ -104,7 +104,7 @@
       <button id="userMenuBtn" class="user-avatar-btn" aria-label="Меню пользователя" aria-haspopup="true" aria-expanded="false"><i data-lucide="user"></i></button>
       <div class="user-menu-dropdown" style="display:none" role="menu" aria-label="Меню пользователя">
         <button class="user-menu-item" data-action="profile" role="menuitem"><i data-lucide="user"></i> Мой профиль</button>
-        <button class="user-menu-item" data-action="submit" role="menuitem"><i data-lucide="file-plus"></i> Предложить тест</button>
+        <button class="user-menu-item" data-action="submit" role="menuitem"><i data-lucide="file-plus"></i> Предложить вопросы</button>
         <div class="user-menu-sep"></div>
         <button class="user-menu-item user-menu-item--danger" data-action="signout" role="menuitem"><i data-lucide="log-out"></i> Выйти</button>
       </div>
@@ -160,7 +160,7 @@
     </div>
 
     <div id="kbHint" class="kb-hint" style="display:none">
-      <span><kbd>Пробел</kbd>/<kbd>Enter</kbd> — показать&nbsp;·&nbsp;<kbd>1</kbd>/<kbd>←</kbd> — верно&nbsp;·&nbsp;<kbd>2</kbd>/<kbd>→</kbd> — неверно</span>
+      <span><kbd>Пробел</kbd>/<kbd>Enter</kbd> — показать&nbsp;/&nbsp;скрыть&nbsp;·&nbsp;<kbd>1</kbd>/<kbd>←</kbd> — верно&nbsp;·&nbsp;<kbd>2</kbd>/<kbd>→</kbd> — неверно</span>
       <button type="button" id="kbHintDismiss" class="kb-hint-dismiss" aria-label="Закрыть подсказку">×</button>
     </div>
 
@@ -214,7 +214,7 @@
         <button id="profileUserMenuBtn" class="user-avatar-btn" aria-label="Меню пользователя" aria-haspopup="true" aria-expanded="false"><i data-lucide="user"></i></button>
         <div class="user-menu-dropdown" style="display:none" role="menu" aria-label="Меню пользователя">
           <button class="user-menu-item" data-action="profile" role="menuitem"><i data-lucide="user"></i> Мой профиль</button>
-          <button class="user-menu-item" data-action="submit" role="menuitem"><i data-lucide="file-plus"></i> Предложить тест</button>
+          <button class="user-menu-item" data-action="submit" role="menuitem"><i data-lucide="file-plus"></i> Предложить вопросы</button>
           <div class="user-menu-sep"></div>
           <button class="user-menu-item user-menu-item--danger" data-action="signout" role="menuitem"><i data-lucide="log-out"></i> Выйти</button>
         </div>
@@ -228,12 +228,12 @@
     </div>
     <div id="profileAccessInfo"></div>
     <div id="profileCodeSection">
-      <label class="auth-label">Код продления
+      <label class="auth-label">Код активации
         <input id="profileCodeInput" class="auth-input" type="text" placeholder="XXXX-XXXX" maxlength="9" spellcheck="false" autocapitalize="none" autocorrect="off">
       </label>
       <div id="profileCodeError" class="auth-msg auth-msg--error" role="alert" style="display:none"></div>
       <div id="profileCodeSuccess" class="auth-msg auth-msg--info" style="display:none"></div>
-      <button id="profileRedeemBtn" class="auth-btn" type="button">Активировать код</button>
+      <button id="profileRedeemBtn" class="auth-btn" type="button">Активировать</button>
     </div>
     <div id="adminBlock" style="display:none">
       <div class="profile-divider"></div>
@@ -259,8 +259,8 @@
 <div id="submitTestScreen" class="screen-center" style="display:none">
   <div class="auth-card panel">
     <h2 class="auth-title brand-title">Мед<span class="brand-accent">Тест</span></h2>
-    <p class="auth-subtitle">Предложить тест</p>
-    <p class="auth-hint">Пришлите файл с вопросами в любом формате — мы добавим их в тренажёр после проверки</p>
+    <p class="auth-subtitle">Предложить вопросы</p>
+    <p class="auth-hint">Загрузите файл с вопросами в любом формате — мы добавим их в тренажёр после проверки</p>
     <div>
       <label class="auth-label">Файл
         <input id="submitFileInput" class="auth-input submit-file-input" type="file">
@@ -272,7 +272,7 @@
       <input id="submitTopicInput" class="auth-input" type="text" placeholder="Например: Фармакология" maxlength="200">
     </label>
     <label class="auth-label">Комментарий (необязательно)
-      <textarea id="submitCommentInput" class="auth-input submit-comment" placeholder="Дополнительная информация о тесте…" maxlength="1000"></textarea>
+      <textarea id="submitCommentInput" class="auth-input submit-comment" placeholder="Например: источник, раздел, особенности вопросов…" maxlength="1000"></textarea>
     </label>
     <div id="submitSuccess" class="auth-msg auth-msg--success" role="status" style="display:none"></div>
     <button id="submitTestBtn" class="auth-btn" type="button">Отправить</button>

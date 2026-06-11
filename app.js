@@ -844,7 +844,7 @@ function showProfileScreen(locked = false) {
     backToAppBtn.style.display = "none";
   } else {
     backToAppBtn.style.display = "";
-    profileRedeemBtn.textContent = "Активировать код";
+    profileRedeemBtn.textContent = "Активировать";
     if (currentUnlimited) {
       profileAccessInfo.innerHTML = `<div class="profile-access profile-access--unlimited"><i data-lucide="infinity"></i> Доступ: бессрочный</div>`;
       profileCodeSection.style.display = "none";
@@ -1075,7 +1075,7 @@ document.addEventListener('click', async (e) => {
     const action = item.dataset.action;
     closeAllMenus();
     if (action === 'profile') { showProfileScreen(); }
-    else if (action === 'submit') { showSubmitTestScreen(); }
+    else if (action === 'submit') { showSubmitQuestionsScreen(); }
     else if (action === 'signout') {
       item.disabled = true;
       await signOut();
@@ -1099,7 +1099,7 @@ const submitSuccess = document.getElementById("submitSuccess");
 const submitTestBtn = document.getElementById("submitTestBtn");
 const backFromSubmitBtn = document.getElementById("backFromSubmitBtn");
 
-function showSubmitTestScreen() {
+function showSubmitQuestionsScreen() {
   submitFileInput.value = "";
   submitTopicInput.value = "";
   submitCommentInput.value = "";
@@ -1184,7 +1184,7 @@ profileRedeemBtn.onclick = async () => {
   const ok = await redeemCode(code);
 
   profileRedeemBtn.disabled = false;
-  profileRedeemBtn.textContent = "Активировать код";
+  profileRedeemBtn.textContent = "Активировать";
 
   if (!ok) {
     profileCodeError.textContent = "Код недействителен или уже использован.";
