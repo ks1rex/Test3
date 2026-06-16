@@ -328,7 +328,10 @@ function showQA(){
 
   answerContainer.innerHTML = "";
   answerInput.style.display = "none";
-  const qText = QA[currentIndex]?.q ?? ("Вопрос #" + (currentIndex + 1));
+  const qRaw = QA[currentIndex]?.q ?? ("Вопрос #" + (currentIndex + 1));
+  const qText = current?.type === "fill_each"
+    ? qRaw.replace(/_{2,}/g, "").replace(/\s{2,}/g, " ").trim()
+    : qRaw;
   switch (current.type) {
 
   case "single":
@@ -581,8 +584,8 @@ function showAnswer() {
   }
 
   else if (current.type === "fill_each") {
-    current.items.forEach((q, i) => {
-      out += q + " " + current.answers[i] + "\n";
+    current.items.forEach((item, i) => {
+      out += item.replace("[___]", current.answers[i]) + "\n";
     });
   }
 
