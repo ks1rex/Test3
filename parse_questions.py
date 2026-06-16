@@ -34,7 +34,7 @@ def extract_fill(para):
         stripped = text.strip()
         if is_bi and re.search(r'[а-яёА-ЯЁa-zA-Z]', stripped):
             segments.append((text, len(answers)))
-            answers.append(stripped)
+            answers.append(stripped.rstrip(".,;:"))
         else:
             segments.append((text, None))
 
