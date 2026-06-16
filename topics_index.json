@@ -38,5 +38,13 @@
   {
     "title": "Микробиология общая",
     "file": "mikra.json"
+  },
+  {
+    "title": "Патофизиология: дополните фразу",
+    "file": "patphys_fill.json"
+  },
+  {
+    "title": "Патофизиология: ситуационные задачи",
+    "file": "patphys_cases.json"
   }
 ]
