@@ -400,8 +400,15 @@ function showQA(){
       input.setAttribute("aria-label", el.item);
 
       const row = document.createElement("div");
-      row.textContent = el.item + " ";
-      row.appendChild(input);
+      const parts = el.item.split("[___]");
+      if (parts.length === 2) {
+        if (parts[0]) row.appendChild(document.createTextNode(parts[0]));
+        row.appendChild(input);
+        if (parts[1]) row.appendChild(document.createTextNode(parts[1]));
+      } else {
+        row.textContent = el.item + " ";
+        row.appendChild(input);
+      }
 
       answerContainer.appendChild(row);
     });
@@ -479,6 +486,7 @@ function showQA(){
   resultBox.style.display = "none";
   resultBox.textContent = "";
   resultBox.className = "";
+  checkBtn.textContent = "Показать ответ";
 
   updateButtons();
   showStep();

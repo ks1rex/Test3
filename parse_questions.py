@@ -62,7 +62,10 @@ def extract_fill(para):
     q = re.sub(r'^[-–]\s*', '', q).strip()
     q = re.sub(r' {2,}', ' ', q)
 
-    items = [build(i, answers) for i in range(len(answers))]
+    if len(answers) == 1:
+        items = ["[___]"]
+    else:
+        items = [build(i, answers) for i in range(len(answers))]
 
     return {
         "type": "fill_each",
