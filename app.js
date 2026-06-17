@@ -330,7 +330,7 @@ function showQA(){
   answerInput.style.display = "none";
   const qRaw = QA[currentIndex]?.q ?? ("Вопрос #" + (currentIndex + 1));
   const qText = current?.type === "fill_each"
-    ? qRaw.replace(/_{2,}/g, "").replace(/\s{2,}/g, " ").trim()
+    ? qRaw.replace(/_{2,}/g, "___").replace(/\s{2,}/g, " ").trim()
     : qRaw;
   switch (current.type) {
 
