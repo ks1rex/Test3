@@ -1447,6 +1447,10 @@ initAccess();
 // 1 / ← (when answer visible) — mark right
 // 2 / → (when answer visible) — mark wrong
 // ← / → (when answer hidden) — navigate prev/next
+document.addEventListener("click", () => {
+  if (document.activeElement?.tagName === "BUTTON") document.activeElement.blur();
+});
+
 document.addEventListener("keydown", (e) => {
   const inTextarea = document.activeElement === answerInput;
   if (!inTextarea) {
