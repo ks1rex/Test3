@@ -35,6 +35,8 @@ const answerInput = document.getElementById("answerInput");
 /* drag-to-resize answer textarea; pointer events cover mouse + touch + pen, native CSS resize doesn't work on phones */
 (function() {
   const handle = document.getElementById("answerResizeHandle");
+  const savedHeight = localStorage.getItem("answerInputHeight");
+  if (savedHeight) answerInput.style.height = savedHeight;
   let startY = 0, startHeight = 0;
   function onMove(e) {
     answerInput.style.height = Math.max(80, startHeight + (e.clientY - startY)) + "px";
@@ -42,6 +44,7 @@ const answerInput = document.getElementById("answerInput");
   function onUp() {
     document.removeEventListener("pointermove", onMove);
     document.removeEventListener("pointerup", onUp);
+    localStorage.setItem("answerInputHeight", answerInput.style.height);
   }
   handle.addEventListener("pointerdown", (e) => {
     startY = e.clientY;
