@@ -1,5 +1,5 @@
 
-const CACHE_NAME = 'test-trainer-v6';
+const CACHE_NAME = 'test-trainer-v7';
 const ASSETS = [
   './',
   'index.html',
