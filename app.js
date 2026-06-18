@@ -32,6 +32,25 @@ const nextBtn = document.getElementById("nextBtn");
 
 const questionBox = document.getElementById("question");
 const answerInput = document.getElementById("answerInput");
+/* drag-to-resize answer textarea; pointer events cover mouse + touch + pen, native CSS resize doesn't work on phones */
+(function() {
+  const handle = document.getElementById("answerResizeHandle");
+  let startY = 0, startHeight = 0;
+  function onMove(e) {
+    answerInput.style.height = Math.max(80, startHeight + (e.clientY - startY)) + "px";
+  }
+  function onUp() {
+    document.removeEventListener("pointermove", onMove);
+    document.removeEventListener("pointerup", onUp);
+  }
+  handle.addEventListener("pointerdown", (e) => {
+    startY = e.clientY;
+    startHeight = answerInput.offsetHeight;
+    document.addEventListener("pointermove", onMove);
+    document.addEventListener("pointerup", onUp);
+    e.preventDefault();
+  });
+})();
 const correctBox = document.getElementById("correctBox");
 const answerContainer = document.getElementById("answerContainer");
 const stepInfo = document.getElementById("stepInfo");
