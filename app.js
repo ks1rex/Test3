@@ -54,6 +54,28 @@ const answerInput = document.getElementById("answerInput");
     e.preventDefault();
   });
 })();
+
+/* drag-to-resize (width + height) for fill_each blanks; native textarea `resize` fights the inline text flow they sit in */
+function makeBlankResizable(textarea, handle) {
+  let startX = 0, startY = 0, startW = 0, startH = 0;
+  function onMove(e) {
+    textarea.style.width = Math.max(64, startW + (e.clientX - startX)) + "px";
+    textarea.style.height = Math.max(32, startH + (e.clientY - startY)) + "px";
+  }
+  function onUp() {
+    document.removeEventListener("pointermove", onMove);
+    document.removeEventListener("pointerup", onUp);
+  }
+  handle.addEventListener("pointerdown", (e) => {
+    startX = e.clientX;
+    startY = e.clientY;
+    startW = textarea.offsetWidth;
+    startH = textarea.offsetHeight;
+    document.addEventListener("pointermove", onMove);
+    document.addEventListener("pointerup", onUp);
+    e.preventDefault();
+  });
+}
 const correctBox = document.getElementById("correctBox");
 const answerContainer = document.getElementById("answerContainer");
 const stepInfo = document.getElementById("stepInfo");
@@ -425,15 +447,25 @@ function showQA(){
       input.dataset.originalIndex = el.index;
       input.setAttribute("aria-label", el.item);
 
+      const handle = document.createElement("span");
+      handle.className = "fillBlankHandle";
+      handle.setAttribute("aria-hidden", "true");
+      makeBlankResizable(input, handle);
+
+      const wrap = document.createElement("span");
+      wrap.className = "fillBlankWrap";
+      wrap.appendChild(input);
+      wrap.appendChild(handle);
+
       const row = document.createElement("div");
       const parts = el.item.split("[___]");
       if (parts.length === 2) {
         if (parts[0]) row.appendChild(document.createTextNode(parts[0]));
-        row.appendChild(input);
+        row.appendChild(wrap);
         if (parts[1]) row.appendChild(document.createTextNode(parts[1]));
       } else {
         row.textContent = el.item + " ";
-        row.appendChild(input);
+        row.appendChild(wrap);
       }
 
       answerContainer.appendChild(row);
