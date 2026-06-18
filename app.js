@@ -65,6 +65,7 @@ function makeBlankResizable(textarea, handle) {
   function onUp() {
     document.removeEventListener("pointermove", onMove);
     document.removeEventListener("pointerup", onUp);
+    localStorage.setItem("fillBlankSize", JSON.stringify({ width: textarea.style.width, height: textarea.style.height }));
   }
   handle.addEventListener("pointerdown", (e) => {
     startX = e.clientX;
@@ -446,6 +447,11 @@ function showQA(){
       input.className = "fillBlank";
       input.dataset.originalIndex = el.index;
       input.setAttribute("aria-label", el.item);
+      const savedBlankSize = JSON.parse(localStorage.getItem("fillBlankSize") || "null");
+      if (savedBlankSize) {
+        input.style.width = savedBlankSize.width;
+        input.style.height = savedBlankSize.height;
+      }
 
       const handle = document.createElement("span");
       handle.className = "fillBlankHandle";
