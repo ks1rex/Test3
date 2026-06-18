@@ -419,8 +419,9 @@ function showQA(){
 
     shuffledFill.forEach((el) => {
 
-      const input = document.createElement("input");
-      input.type = "text";
+      const input = document.createElement("textarea");
+      input.rows = 1;
+      input.className = "fillBlank";
       input.dataset.originalIndex = el.index;
       input.setAttribute("aria-label", el.item);
 
@@ -559,7 +560,7 @@ function showAnswer() {
 
   if (current.type === "fill_each") {
     let ok = true;
-    answerContainer.querySelectorAll("input[type='text']").forEach(input => {
+    answerContainer.querySelectorAll(".fillBlank").forEach(input => {
       const originalIndex = parseInt(input.dataset.originalIndex);
       if (input.value.trim().toLowerCase() !==
           current.answers[originalIndex].toLowerCase()) ok = false;
