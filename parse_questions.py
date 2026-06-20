@@ -91,7 +91,7 @@ def parse_document():
         t = p.text.strip()
         if etalony_idx is None and re.search(r'Эталоны?\s+ответов', t, re.I):
             etalony_idx = i
-        if re.match(r'Задание\s+\d+', t):
+        if re.match(r'Зада(?:ние|ча)\s+\d+', t):
             if first_zadanie is None:
                 first_zadanie = i
 
@@ -114,41 +114,52 @@ def parse_document():
             skipped.append(t[:80])
 
     # ── Part 2: практические задачи ───────────────────────────────────────
+    # Headers come in two spellings: "Задание N" and "Задача N".
+    header_re = re.compile(r'Зада(?:ние|ча)\s+\d+')
+    # "Эталон ответа:" marker — may sit on its own line OR be glued to the end
+    # of the scenario paragraph (e.g. задание 95).
+    marker_re = re.compile(r'Эталоны?\s+ответа\s*:', re.I)
+
+    def split_block(lines):
+        """lines = content paragraphs of one case (header excluded).
+        Returns (question_lines, answer_lines)."""
+        for k, t in enumerate(lines):
+            m = marker_re.search(t)
+            if m:
+                before, after = t[:m.start()].strip(), t[m.end():].strip()
+                q = lines[:k] + ([before] if before else [])
+                a = ([after] if after else []) + lines[k + 1:]
+                return q, a
+        # No marker (задания 61, 168, 174-179): layout is
+        #   <questions...> <one scenario> <answers...> with #q == #a,
+        # so an odd line count splits at the middle (scenario stays with q).
+        # ponytail: assumes balanced q/a; holds for all marker-less blocks here.
+        n = len(lines)
+        if n >= 3 and n % 2 == 1:
+            half = (n - 1) // 2
+            return lines[:half + 1], lines[half + 1:]
+        return lines, []
+
     if first_zadanie is not None:
-        current_q_parts = []
-        current_a_parts = []
-        in_answer = False
-        zadanie_title = ""
-
-        def flush_case():
-            if current_q_parts or zadanie_title:
-                q_text = "\n".join(current_q_parts).strip()
-                a_text = "\n".join(current_a_parts).strip()
-                if q_text and a_text:
-                    cases.append({"q": q_text, "a": a_text})
-
+        # Collect content lines per case, then split each block.
+        blocks = []  # list of (header, [content lines])
         for i in range(first_zadanie, len(paras)):
-            p = paras[i]
-            t = p.text.strip()
+            t = paras[i].text.strip()
             if not t:
                 continue
+            if header_re.match(t):
+                blocks.append((t, []))
+            elif blocks:
+                blocks[-1][1].append(t)
 
-            if re.match(r'Задание\s+\d+', t):
-                flush_case()
-                current_q_parts = []
-                current_a_parts = []
-                in_answer = False
-                zadanie_title = t
-                # Include the Задание header in the question
-                current_q_parts.append(t)
-            elif re.match(r'Эталоны?\s+ответа\s*:', t, re.I) or t.lower().startswith("эталон ответа"):
-                in_answer = True
-            elif in_answer:
-                current_a_parts.append(t)
+        for header, content in blocks:
+            q_lines, a_lines = split_block(content)
+            q_text = "\n".join([header] + q_lines).strip()
+            a_text = "\n".join(a_lines).strip()
+            if q_text and a_text:
+                cases.append({"q": q_text, "a": a_text})
             else:
-                current_q_parts.append(t)
-
-        flush_case()
+                skipped.append(header)
 
     return fill_questions, cases, skipped
 
